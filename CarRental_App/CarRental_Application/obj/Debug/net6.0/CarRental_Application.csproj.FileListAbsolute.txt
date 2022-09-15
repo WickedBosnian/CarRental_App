@@ -3,3 +3,13 @@ C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental
 C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\obj\Debug\net6.0\CarRental_Application.AssemblyInfoInputs.cache
 C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\obj\Debug\net6.0\CarRental_Application.AssemblyInfo.cs
 C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\obj\Debug\net6.0\CarRental_Application.csproj.CoreCompileInputs.cache
+C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\bin\Debug\net6.0\CarRental_Application.deps.json
+C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\bin\Debug\net6.0\CarRental_Application.dll
+C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\bin\Debug\net6.0\CarRental_Application.pdb
+C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\bin\Debug\net6.0\CarRental_Domain.dll
+C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\bin\Debug\net6.0\CarRental_Domain.pdb
+C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\obj\Debug\net6.0\CarRental_Application.csproj.CopyComplete
+C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\obj\Debug\net6.0\CarRental_Application.dll
+C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\obj\Debug\net6.0\refint\CarRental_Application.dll
+C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\obj\Debug\net6.0\CarRental_Application.pdb
+C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\obj\Debug\net6.0\ref\CarRental_Application.dll

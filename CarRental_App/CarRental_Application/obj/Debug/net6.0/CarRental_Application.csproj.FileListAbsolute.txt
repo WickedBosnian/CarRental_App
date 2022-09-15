@@ -1,0 +1,5 @@
+C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\obj\Debug\net6.0\CarRental_Application.csproj.AssemblyReference.cache
+C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\obj\Debug\net6.0\CarRental_Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\obj\Debug\net6.0\CarRental_Application.AssemblyInfoInputs.cache
+C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\obj\Debug\net6.0\CarRental_Application.AssemblyInfo.cs
+C:\Users\wicke\Desktop\Infobip task\WebApp\CarRental_App\CarRental_App\CarRental_Application\obj\Debug\net6.0\CarRental_Application.csproj.CoreCompileInputs.cache

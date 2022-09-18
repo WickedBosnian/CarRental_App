@@ -110,9 +110,28 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<Client> GetClientsByFilters()
+        public IEnumerable<Client> GetClientsByFilters(DateTime? birthdate, string? firstname, string? lastname, string? driverLicenceNumber, string? personalIdCardNumber, string? gender)
         {
-            throw new NotImplementedException();
+            string sqlCommand = "EXEC dbo.GetClientsByFilters @Firstname, @Lastname, @DriverLicenceNumber, @PersonalIDCardNumber, @Birthdate, @Gender";
+
+            try
+            {
+                List<SqlParameter> sqlParams = new List<SqlParameter>
+                {
+                    new SqlParameter { ParameterName = "@Firstname", Value = String.IsNullOrEmpty(firstname) ? DBNull.Value : firstname},
+                    new SqlParameter { ParameterName = "@Lastname", Value = String.IsNullOrEmpty(lastname) ? DBNull.Value : lastname},
+                    new SqlParameter { ParameterName = "@DriverLicenceNumber", Value = String.IsNullOrEmpty(driverLicenceNumber) ? DBNull.Value : driverLicenceNumber},
+                    new SqlParameter { ParameterName = "@PersonalIdcardNumber", Value = String.IsNullOrEmpty(personalIdCardNumber) ? DBNull.Value : personalIdCardNumber},
+                    new SqlParameter { ParameterName = "@Birthdate", Value = birthdate == null ? DBNull.Value : birthdate},
+                    new SqlParameter { ParameterName = "@Gender", Value = String.IsNullOrEmpty(gender) ? DBNull.Value : gender}
+                };
+
+                return _context.Clients.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable();
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception(sqlEx.Message + ";" + sqlEx.InnerException?.Message);
+            }
         }
 
         public void UpdateClient(Client client)

@@ -11,7 +11,7 @@ namespace CarRental_Application.Repositories
     {
         IEnumerable<Client> GetAllClients();
         Client GetClientById(int id);
-        IEnumerable<Client> GetClientsByFilters();
+        IEnumerable<Client> GetClientsByFilters(DateTime? birthdate, string? firstname, string? lastname, string? driverLicenceNumber, string? personalIdCardNumber, string? gender);
         int CreateClient(Client client);
         void UpdateClient(Client client);
         int DeleteClient(int id);

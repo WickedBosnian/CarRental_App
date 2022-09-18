@@ -30,6 +30,19 @@ namespace CarRental_API.Controllers
             }
         }
 
+        [HttpGet("SearchClients")]
+        public ActionResult<List<Client>> SearchClients(DateTime? birthdate, string? firstname, string? lastname, string? driverLicenceNumber, string? personalIdCardNumber, string? gender)
+        {
+            try
+            {
+                return Ok(_clientService.GetClientsByFilters(birthdate, firstname, lastname, driverLicenceNumber, personalIdCardNumber, gender));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message + ";" + ex.InnerException?.Message);
+            }
+        }
+
         [HttpGet]
         public ActionResult<List<Client>> GetAll()
         {

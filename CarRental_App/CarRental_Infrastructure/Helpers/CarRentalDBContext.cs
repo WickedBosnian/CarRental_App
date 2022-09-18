@@ -19,7 +19,6 @@ namespace CarRental_Infrastructure.Helpers
 
         public virtual DbSet<Client> Clients { get; set; }
         public DbSet<Reservation> Reservations { get; set; } = null!;
-        public DbSet<ReservedVehicle> ReservedVehicles { get; set; } = null!;
         public DbSet<Vehicle> Vehicles { get; set; } = null!;
         public DbSet<VehicleManufacturer> VehicleManufacturers { get; set; } = null!;
         public DbSet<VehicleType> VehicleTypes { get; set; } = null!;
@@ -46,11 +45,6 @@ namespace CarRental_Infrastructure.Helpers
             {
                 entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
 
-            });
-
-            modelBuilder.Entity<ReservedVehicle>(entity =>
-            {
-                entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
             });
 
             modelBuilder.Entity<Vehicle>(entity =>

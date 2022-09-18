@@ -10,5 +10,9 @@ namespace CarRental_Application.Interfaces
     public interface IReservationServices
     {
         IEnumerable<Reservation> GetAllReservations();
+        IEnumerable<Reservation> SearchReservations(DateTime? dateFrom, DateTime? dateTo, int? clientId, int? vehicleId, bool? active);
+        Reservation GetReservationById(int id);
+        int CreateReservation(Reservation reservation);
+        void CancelReservation(int id);
     }
 }

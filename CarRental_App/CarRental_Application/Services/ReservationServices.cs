@@ -16,9 +16,30 @@ namespace CarRental_Application.Services
         {
             _reservationRepository = reservationRepository;
         }
+
+        public void CancelReservation(int id)
+        {
+            _reservationRepository.CancelReservation(id);
+        }
+
+        public int CreateReservation(Reservation reservation)
+        {
+            return _reservationRepository.CreateReservation(reservation);
+        }
+
         public IEnumerable<Reservation> GetAllReservations()
         {
             return _reservationRepository.GetAllReservations();
+        }
+
+        public Reservation GetReservationById(int id)
+        {
+            return _reservationRepository.GetReservationById(id);
+        }
+
+        public IEnumerable<Reservation> SearchReservations(DateTime? dateFrom, DateTime? dateTo, int? clientId, int? vehicleId, bool? active)
+        {
+            return _reservationRepository.SearchReservations(dateFrom, dateTo, clientId, vehicleId, active);
         }
     }
 }

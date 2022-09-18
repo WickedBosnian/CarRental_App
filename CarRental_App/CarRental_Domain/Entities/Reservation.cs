@@ -13,17 +13,21 @@ namespace CarRental_Domain.Entities
         public int ReservationId { get; set; }
         [Column("ClientID")]
         public int ClientId { get; set; }
+        [Column("VehicleID")]
+        public int VehicleID { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime ReservationDateFrom { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime ReservationDateTo { get; set; }
         public bool Active { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime CreatedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? ModifiedDate { get; set; }
 
         [ForeignKey("ClientId")]
-        public virtual Client Client { get; set; } = null!;
+        public virtual Client? Client { get; set; }
+        [ForeignKey("VehicleId")]
+        public virtual Vehicle? Vehicle { get; set; }
     }
 }

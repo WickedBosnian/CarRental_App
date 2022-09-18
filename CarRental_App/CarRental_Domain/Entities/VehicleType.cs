@@ -16,7 +16,7 @@ namespace CarRental_Domain.Entities
         [StringLength(1)]
         public string? VehicleTypeDescription { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime CreatedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? ModifiedDate { get; set; }
     }

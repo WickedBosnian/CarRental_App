@@ -28,7 +28,7 @@ namespace CarRental_Domain.Entities
         [StringLength(20)]
         public string? PersonalIdcardNumber { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime CreatedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? ModifiedDate { get; set; }
     }

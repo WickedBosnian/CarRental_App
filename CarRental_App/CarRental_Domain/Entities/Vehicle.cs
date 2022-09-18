@@ -11,6 +11,8 @@ namespace CarRental_Domain.Entities
         [Key]
         [Column("VehicleID")]
         public int VehicleId { get; set; }
+        [Column("VehicleName")]
+        public string VehicleName { get; set; } = null!;
         [Column("VehicleManufacturerID")]
         public int VehicleManufacturerId { get; set; }
         [Column("VehicleTypeID")]
@@ -27,8 +29,8 @@ namespace CarRental_Domain.Entities
         public DateTime? ModifiedDate { get; set; }
 
         [ForeignKey("VehicleManufacturerId")]
-        public virtual VehicleManufacturer VehicleManufacturer { get; set; } = null!;
+        public virtual VehicleManufacturer? VehicleManufacturer { get; set; }
         [ForeignKey("VehicleTypeId")]
-        public virtual VehicleType VehicleType { get; set; } = null!;
+        public virtual VehicleType? VehicleType { get; set; }
     }
 }

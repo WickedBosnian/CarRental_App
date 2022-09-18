@@ -25,7 +25,7 @@ namespace CarRental_Application.Services
 
         public int DeleteClient(int id)
         {
-            throw new NotImplementedException();
+            return _clientRepository.DeleteClient(id);
         }
 
         public IEnumerable<Client> GetAllClients()

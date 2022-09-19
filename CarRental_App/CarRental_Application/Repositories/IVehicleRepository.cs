@@ -1,4 +1,5 @@
 ﻿using CarRental_Domain.Entities;
+using CarRental_DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,11 @@ namespace CarRental_Application.Repositories
 {
     public interface IVehicleRepository
     {
-        IEnumerable<Vehicle> GetAllVehicles();
-        IEnumerable<Vehicle> SearchVehicles(string? vehicleName, int? vehicleManufacturerId, int? vehicleTypeId);
-        Vehicle GetVehicleById(int id);
-        int CreateVehicle(Vehicle vehicle);
-        void UpdateVehicle(Vehicle vehicle);
+        IEnumerable<VehicleDTO> GetAllVehicles();
+        IEnumerable<VehicleDTO> SearchVehicles(string? vehicleName, int? vehicleManufacturerId, int? vehicleTypeId);
+        VehicleDTO GetVehicleById(int id);
+        int CreateVehicle(VehicleDTO vehicle);
+        void UpdateVehicle(VehicleDTO vehicle);
         int DeleteVehicle(int id);
     }
 }

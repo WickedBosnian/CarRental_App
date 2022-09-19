@@ -11,6 +11,16 @@
         "runtime": {
           "bin/placeholder/CarRental_Domain.dll": {}
         }
+      },
+      "CarRental_DTO/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/CarRental_DTO.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/CarRental_DTO.dll": {}
+        }
       }
     }
   },
@@ -19,10 +29,16 @@
       "type": "project",
       "path": "../CarRental_Domain/CarRental_Domain.csproj",
       "msbuildProject": "../CarRental_Domain/CarRental_Domain.csproj"
+    },
+    "CarRental_DTO/1.0.0": {
+      "type": "project",
+      "path": "../CarRental_DTO/CarRental_DTO.csproj",
+      "msbuildProject": "../CarRental_DTO/CarRental_DTO.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net6.0": [
+      "CarRental_DTO >= 1.0.0",
       "CarRental_Domain >= 1.0.0"
     ]
   },
@@ -61,6 +77,9 @@
           "projectReferences": {
             "C:\\Users\\wicke\\Desktop\\Infobip task\\WebApp\\CarRental_App\\CarRental_App\\CarRental_Domain\\CarRental_Domain.csproj": {
               "projectPath": "C:\\Users\\wicke\\Desktop\\Infobip task\\WebApp\\CarRental_App\\CarRental_App\\CarRental_Domain\\CarRental_Domain.csproj"
+            },
+            "C:\\Users\\wicke\\Desktop\\Infobip task\\WebApp\\CarRental_App\\CarRental_App\\CarRental_DTO\\CarRental_DTO.csproj": {
+              "projectPath": "C:\\Users\\wicke\\Desktop\\Infobip task\\WebApp\\CarRental_App\\CarRental_App\\CarRental_DTO\\CarRental_DTO.csproj"
             }
           }
         }

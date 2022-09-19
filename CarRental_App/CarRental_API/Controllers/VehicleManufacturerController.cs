@@ -1,6 +1,6 @@
-﻿using CarRental_Application.Interfaces;
-using CarRental_Application.Services;
+﻿using CarRental_Application.Repositories;
 using CarRental_Domain.Entities;
+using CarRental_DTO;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -12,19 +12,19 @@ namespace CarRental_API.Controllers
     [ApiController]
     public class VehicleManufacturerController : ControllerBase
     {
-        private IVehicleManufacturerServices _vehicleManufacturerServices;
-        public VehicleManufacturerController(IVehicleManufacturerServices vehicleManufacturerServices)
+        private IVehicleManufacturerRepository _vehicleManufacturerRepository;
+        public VehicleManufacturerController(IVehicleManufacturerRepository vehicleManufacturerRepository)
         {
-            _vehicleManufacturerServices = vehicleManufacturerServices;
+            _vehicleManufacturerRepository = vehicleManufacturerRepository;
         }
 
         // GET: api/<VehicleManufacturerController>
         [HttpGet]
-        public ActionResult<IEnumerable<VehicleManufacturer>> Get()
+        public ActionResult<IEnumerable<VehicleManufacturerDTO>> Get()
         {
             try
             {
-                return Ok(_vehicleManufacturerServices.GetAllVehicleManufacturers());
+                return Ok(_vehicleManufacturerRepository.GetAllVehicleManufacturers());
             }
             catch (Exception ex)
             {
@@ -34,11 +34,11 @@ namespace CarRental_API.Controllers
 
         // GET api/<VehicleManufacturerController>/5
         [HttpGet("{id}")]
-        public ActionResult<VehicleManufacturer> Get(int id)
+        public ActionResult<VehicleManufacturerDTO> Get(int id)
         {
             try
             {
-                return Ok(_vehicleManufacturerServices.GetVehicleManufacturerById(id));
+                return Ok(_vehicleManufacturerRepository.GetVehicleManufacturerById(id));
             }
             catch (Exception ex)
             {
@@ -48,11 +48,11 @@ namespace CarRental_API.Controllers
 
         // POST api/<VehicleManufacturerController>
         [HttpPost]
-        public ActionResult<int> Post(VehicleManufacturer vehicleManufacturer)
+        public ActionResult<int> Post(VehicleManufacturerDTO vehicleManufacturer)
         {
             try
             {
-                int vehicleManufacturerId = _vehicleManufacturerServices.CreateVehicleManufacturer(vehicleManufacturer);
+                int vehicleManufacturerId = _vehicleManufacturerRepository.CreateVehicleManufacturer(vehicleManufacturer);
                 if (vehicleManufacturerId == -1)
                 {
                     throw new Exception("There was an error. Client was not created.");
@@ -67,12 +67,12 @@ namespace CarRental_API.Controllers
         }
 
         // PUT api/<VehicleManufacturerController>/5
-        [HttpPut("{id}")]
-        public ActionResult Put(VehicleManufacturer vehicleManufacturer)
+        [HttpPut]
+        public ActionResult Put(VehicleManufacturerDTO vehicleManufacturer)
         {
             try
             {
-                _vehicleManufacturerServices.UpdateVehicleManufacturer(vehicleManufacturer);
+                _vehicleManufacturerRepository.UpdateVehicleManufacturer(vehicleManufacturer);
                 return Ok();
             }
             catch (Exception ex)
@@ -87,7 +87,7 @@ namespace CarRental_API.Controllers
         {
             try
             {
-                return _vehicleManufacturerServices.DeleteVehicleManufacturer(id);
+                return _vehicleManufacturerRepository.DeleteVehicleManufacturer(id);
             }
             catch (Exception ex)
             {

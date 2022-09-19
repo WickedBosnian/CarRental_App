@@ -1,6 +1,7 @@
 ﻿using CarRental_Application.Repositories;
 using CarRental_Domain.Entities;
 using CarRental_Domain.Enums;
+using CarRental_DTO;
 using CarRental_Infrastructure.Helpers;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -49,7 +50,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public int CreateReservation(Reservation reservation)
+        public int CreateReservation(ReservationDTO reservation)
         {
             int createdReservationId = -1;
             string sqlCommand = "EXEC dbo.CreateReservation @ClientId, @VehicleID, @ReservationDateFrom, @ReservationDateTo";
@@ -86,13 +87,14 @@ namespace CarRental_Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Reservation> GetAllReservations()
+        public IEnumerable<ReservationDTO> GetAllReservations()
         {
             string sqlCommand = $"EXEC dbo.GetAllReservations";
 
             try
             {
-                return _context.Reservations.FromSqlRaw(sqlCommand);
+                IEnumerable<Reservation> reservations = _context.Reservations.FromSqlRaw(sqlCommand);
+                return reservations.Select(x => Mapper.ToReservationDTO(x));
             }
             catch (SqlException sqlEx)
             {
@@ -100,7 +102,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public Reservation GetReservationById(int id)
+        public ReservationDTO GetReservationById(int id)
         {
             string sqlCommand = $"EXEC dbo.GetReservationById @ReservationId";
 
@@ -117,7 +119,7 @@ namespace CarRental_Infrastructure.Repositories
                     throw new Exception($"Reservation with ID {id} was not found!");
                 }
 
-                return reservation;
+                return Mapper.ToReservationDTO(reservation);
             }
             catch (SqlException sqlEx)
             {
@@ -125,7 +127,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<Reservation> SearchReservations(DateTime? dateFrom, DateTime? dateTo, int? clientId, int? vehicleId, bool? active)
+        public IEnumerable<ReservationDTO> SearchReservations(DateTime? dateFrom, DateTime? dateTo, int? clientId, int? vehicleId, bool? active)
         {
             string sqlCommand = "EXEC dbo.SearchReservations @DateFrom, @DateTo, @ClientId, @VehicleId, @Active";
 
@@ -140,7 +142,8 @@ namespace CarRental_Infrastructure.Repositories
                     new SqlParameter { ParameterName = "@Active", Value = active == null ? DBNull.Value : active}
                 };
 
-                return _context.Reservations.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable();
+                IEnumerable<Reservation> reservations = _context.Reservations.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable();
+                return reservations.Select(x => Mapper.ToReservationDTO(x));
             }
             catch (SqlException sqlEx)
             {

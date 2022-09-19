@@ -1,7 +1,6 @@
-﻿using CarRental_Application.Interfaces;
-using CarRental_Application.Repositories;
-using CarRental_Application.Services;
+﻿using CarRental_Application.Repositories;
 using CarRental_Domain.Entities;
+using CarRental_DTO;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -12,20 +11,22 @@ namespace CarRental_API.Controllers
     [ApiController]
     public class ReservationController : ControllerBase
     {
-        private IReservationServices _reservationServices;
-        private IClientServices _clientServices;
-        public ReservationController(IReservationServices reservationServices, IClientServices clientServices)
+        private IReservationRepository _reservationRepository;
+        private IClientRepository _clientRepository;
+        private IVehicleRepository _vehicleRepository;
+        public ReservationController(IReservationRepository reservationRepository, IClientRepository clientRepository, IVehicleRepository vehicleRepository)
         {
-            _reservationServices = reservationServices;
-            _clientServices = clientServices;
+            _reservationRepository = reservationRepository;
+            _clientRepository = clientRepository;
+            _vehicleRepository = vehicleRepository;
         }
         // GET: api/<ReservationController>
         [HttpGet]
-        public ActionResult<IEnumerable<Reservation>> Get()
+        public ActionResult<IEnumerable<ReservationDTO>> Get()
         {
             try
             {
-                return Ok(_reservationServices.GetAllReservations());
+                return Ok(_reservationRepository.GetAllReservations());
             }
             catch (Exception ex)
             {
@@ -34,11 +35,11 @@ namespace CarRental_API.Controllers
         }
 
         [HttpGet("SearchReservations")]
-        public ActionResult<List<Client>> SearchReservations(DateTime? dateFrom, DateTime? dateTo, int? clientId, int? vehicleId, bool? active)
+        public ActionResult<List<ReservationDTO>> SearchReservations(DateTime? dateFrom, DateTime? dateTo, int? clientId, int? vehicleId, bool? active)
         {
             try
             {
-                return Ok(_reservationServices.SearchReservations(dateFrom, dateTo, clientId, vehicleId, active));
+                return Ok(_reservationRepository.SearchReservations(dateFrom, dateTo, clientId, vehicleId, active));
             }
             catch (Exception ex)
             {
@@ -48,12 +49,13 @@ namespace CarRental_API.Controllers
 
         // GET api/<ReservationController>/5
         [HttpGet("{id}")]
-        public ActionResult<Reservation> Get(int id)
+        public ActionResult<ReservationDTO> Get(int id)
         {
             try
             {
-                Reservation reservation = _reservationServices.GetReservationById(id);
-                reservation.Client = _clientServices.GetClientById(reservation.ClientId);
+                ReservationDTO reservation = _reservationRepository.GetReservationById(id);
+                reservation.Client = _clientRepository.GetClientById((int)reservation.ClientId);
+                reservation.Vehicle = _vehicleRepository.GetVehicleById((int)reservation.VehicleID);
 
                 return Ok(reservation);
             }
@@ -65,11 +67,11 @@ namespace CarRental_API.Controllers
 
         // POST api/<ReservationController>
         [HttpPost]
-        public ActionResult<int> Post(Reservation reservation)
+        public ActionResult<int> Post(ReservationDTO reservation)
         {
             try
             {
-                int reservationId = _reservationServices.CreateReservation(reservation);
+                int reservationId = _reservationRepository.CreateReservation(reservation);
                 if (reservationId == -1)
                 {
                     throw new Exception("There was an error. Reservation was not created.");
@@ -89,7 +91,7 @@ namespace CarRental_API.Controllers
         {
             try
             {
-                _reservationServices.CancelReservation(id);
+                _reservationRepository.CancelReservation(id);
                 return Ok();
             }
             catch (Exception ex)

@@ -1,5 +1,6 @@
 ﻿using CarRental_Application.Repositories;
 using CarRental_Domain.Entities;
+using CarRental_DTO;
 using CarRental_Infrastructure.Helpers;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +20,7 @@ namespace CarRental_Infrastructure.Repositories
         {
             _context = context;
         }
-        public int CreateVehicleType(VehicleType vehicleType)
+        public int CreateVehicleType(VehicleTypeDTO vehicleType)
         {
             int createdVehicleType = -1;
             string sqlCommand = "EXEC dbo.CreateVehicleType @VehicleTypeName, @VehicleTypeDescription";
@@ -77,13 +78,14 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<VehicleType> GetAllVehicleTypes()
+        public IEnumerable<VehicleTypeDTO> GetAllVehicleTypes()
         {
             string sqlCommand = "EXEC dbo.GetAllVehicleTypes";
 
             try
             {
-                return _context.VehicleTypes.FromSqlRaw(sqlCommand).AsEnumerable();
+                IEnumerable<VehicleType> vehicleTypes = _context.VehicleTypes.FromSqlRaw(sqlCommand).AsEnumerable();
+                return vehicleTypes.Select(x => Mapper.ToVehicleTypeDTO(x));
             }
             catch (SqlException sqlEx)
             {
@@ -91,7 +93,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public VehicleType GetVehicleTypeById(int id)
+        public VehicleTypeDTO GetVehicleTypeById(int id)
         {
             string sqlCommand = "EXEC dbo.GetVehicleTypeById @VehicleTypeId";
 
@@ -109,7 +111,7 @@ namespace CarRental_Infrastructure.Repositories
                     throw new Exception($"Vehicle type with ID {id} was not found!");
                 }
 
-                return vehicleType;
+                return Mapper.ToVehicleTypeDTO(vehicleType);
             }
             catch (SqlException sqlEx)
             {
@@ -117,7 +119,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public void UpdateVehicleType(VehicleType vehicleType)
+        public void UpdateVehicleType(VehicleTypeDTO vehicleType)
         {
             string sqlCommand = "EXEC dbo.UpdateVehicleType @VehicleTypeId, @VehicleTypeName, @VehicleTypeDescription";
 

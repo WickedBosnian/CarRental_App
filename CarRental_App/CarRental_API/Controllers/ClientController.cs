@@ -1,5 +1,6 @@
-﻿using CarRental_Application.Interfaces;
+﻿using CarRental_Application.Repositories;
 using CarRental_Domain.Entities;
+using CarRental_DTO;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -10,19 +11,19 @@ namespace CarRental_API.Controllers
     [ApiController]
     public class ClientController : ControllerBase
     {
-        private IClientServices _clientService;
-        public ClientController(IClientServices clientService)
+        private IClientRepository _clientRepository;
+        public ClientController(IClientRepository clientService)
         {
-            _clientService = clientService;
+            _clientRepository = clientService;
         }
 
         // GET api/<ClientController>/5
         [HttpGet("{id}")]
-        public ActionResult<Client> Get(int id)
+        public ActionResult<ClientDTO> Get(int id)
         {
             try
             {
-                return Ok(_clientService.GetClientById(id));
+                return Ok(_clientRepository.GetClientById(id));
             }
             catch (Exception ex)
             {
@@ -31,11 +32,11 @@ namespace CarRental_API.Controllers
         }
 
         [HttpGet("SearchClients")]
-        public ActionResult<List<Client>> SearchClients(DateTime? birthdate, string? firstname, string? lastname, string? driverLicenceNumber, string? personalIdCardNumber, string? gender)
+        public ActionResult<List<ClientDTO>> SearchClients(DateTime? birthdate, string? firstname, string? lastname, string? driverLicenceNumber, string? personalIdCardNumber, string? gender)
         {
             try
             {
-                return Ok(_clientService.GetClientsByFilters(birthdate, firstname, lastname, driverLicenceNumber, personalIdCardNumber, gender));
+                return Ok(_clientRepository.GetClientsByFilters(birthdate, firstname, lastname, driverLicenceNumber, personalIdCardNumber, gender));
             }
             catch (Exception ex)
             {
@@ -44,11 +45,11 @@ namespace CarRental_API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Client>> GetAll()
+        public ActionResult<List<ClientDTO>> GetAll()
         {
             try
             {
-                return Ok(_clientService.GetAllClients());
+                return Ok(_clientRepository.GetAllClients());
             }
             catch (Exception ex)
             {
@@ -58,11 +59,11 @@ namespace CarRental_API.Controllers
 
         // POST api/<ClientController>
         [HttpPost]
-        public ActionResult<int> PostClient(Client client)
+        public ActionResult<int> PostClient(ClientDTO client)
         {
             try
             {
-                int clientId = _clientService.CreateClient(client);
+                int clientId = _clientRepository.CreateClient(client);
                 if(clientId == -1)
                 {
                     throw new Exception("There was an error. Client was not created.");
@@ -77,11 +78,11 @@ namespace CarRental_API.Controllers
 
         //// PUT api/<ClientController>/5
         [HttpPut]
-        public ActionResult Put(Client client)
+        public ActionResult Put(ClientDTO client)
         {
             try
             {
-                _clientService.UpdateClient(client);
+                _clientRepository.UpdateClient(client);
                 return Ok();
             }
             catch (Exception ex)
@@ -96,7 +97,7 @@ namespace CarRental_API.Controllers
         {
             try
             {
-                return _clientService.DeleteClient(id);
+                return _clientRepository.DeleteClient(id);
             }
             catch (Exception ex)
             {

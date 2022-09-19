@@ -1,4 +1,5 @@
 ﻿using CarRental_Domain.Entities;
+using CarRental_DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,11 @@ namespace CarRental_Application.Repositories
 {
     public interface IClientRepository
     {
-        IEnumerable<Client> GetAllClients();
-        Client GetClientById(int id);
-        IEnumerable<Client> GetClientsByFilters(DateTime? birthdate, string? firstname, string? lastname, string? driverLicenceNumber, string? personalIdCardNumber, string? gender);
-        int CreateClient(Client client);
-        void UpdateClient(Client client);
+        IEnumerable<ClientDTO> GetAllClients();
+        ClientDTO GetClientById(int id);
+        IEnumerable<ClientDTO> GetClientsByFilters(DateTime? birthdate, string? firstname, string? lastname, string? driverLicenceNumber, string? personalIdCardNumber, string? gender);
+        int CreateClient(ClientDTO client);
+        void UpdateClient(ClientDTO client);
         int DeleteClient(int id);
     }
 }

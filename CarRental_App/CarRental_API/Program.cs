@@ -1,6 +1,4 @@
-using CarRental_Application.Interfaces;
 using CarRental_Application.Repositories;
-using CarRental_Application.Services;
 using CarRental_Infrastructure.Helpers;
 using CarRental_Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -20,15 +18,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<CarRentalDBContext>(opt => 
     opt.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("CarRental_Infrastructure")));
 
-builder.Services.AddScoped<IClientServices, ClientServices>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
-builder.Services.AddScoped<IReservationServices, ReservationServices>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
-builder.Services.AddScoped<IVehicleTypeServices, VehicleTypeServices>();
 builder.Services.AddScoped<IVehicleTypeRepository, VehicleTypeRepository>();
-builder.Services.AddScoped<IVehicleManufacturerServices, VehicleManufacturerServices>();
 builder.Services.AddScoped<IVehicleManufacturerRepository, VehicleManufacturerRepository>();
-builder.Services.AddScoped<IVehicleServices, VehicleServices>();
 builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 
 var app = builder.Build();

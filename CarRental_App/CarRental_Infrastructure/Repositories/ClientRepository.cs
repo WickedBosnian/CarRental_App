@@ -1,5 +1,6 @@
 ﻿using CarRental_Application.Repositories;
 using CarRental_Domain.Entities;
+using CarRental_DTO;
 using CarRental_Infrastructure.Helpers;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +23,7 @@ namespace CarRental_Infrastructure.Repositories
             _context = context;
         }
 
-        public int CreateClient(Client client)
+        public int CreateClient(ClientDTO client)
         {
             int createdClientId = -1;
             string sqlCommand = "EXEC dbo.CreateClient @Firstname, @Lastname, @DriverLicenceNumber, @PersonalIdcardNumber, @Birthdate, @Gender";
@@ -84,13 +85,14 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<Client> GetAllClients()
+        public IEnumerable<ClientDTO> GetAllClients()
         {
             string sqlCommand = "EXEC dbo.GetAllClients";
 
             try
             {
-                return _context.Clients.FromSqlRaw(sqlCommand).AsEnumerable();
+                IEnumerable<Client> clients = _context.Clients.FromSqlRaw(sqlCommand).AsEnumerable();
+                return clients.Select(x => Mapper.ToClientDTO(x));
             }
             catch (SqlException sqlEx)
             {
@@ -98,7 +100,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public Client GetClientById(int id)
+        public ClientDTO GetClientById(int id)
         {
             string sqlCommand = "EXEC dbo.GetClientById @ClientId";
 
@@ -115,7 +117,7 @@ namespace CarRental_Infrastructure.Repositories
                     throw new Exception($"Client with ID {id} was not found!");
                 }
 
-                return client;
+                return Mapper.ToClientDTO(client);
             }
             catch (SqlException sqlEx)
             {
@@ -123,7 +125,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<Client> GetClientsByFilters(DateTime? birthdate, string? firstname, string? lastname, string? driverLicenceNumber, string? personalIdCardNumber, string? gender)
+        public IEnumerable<ClientDTO> GetClientsByFilters(DateTime? birthdate, string? firstname, string? lastname, string? driverLicenceNumber, string? personalIdCardNumber, string? gender)
         {
             string sqlCommand = "EXEC dbo.GetClientsByFilters @Firstname, @Lastname, @DriverLicenceNumber, @PersonalIDCardNumber, @Birthdate, @Gender";
 
@@ -139,7 +141,8 @@ namespace CarRental_Infrastructure.Repositories
                     new SqlParameter { ParameterName = "@Gender", Value = String.IsNullOrEmpty(gender) ? DBNull.Value : gender}
                 };
 
-                return _context.Clients.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable();
+                IEnumerable<Client> clients = _context.Clients.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable();
+                return clients.Select(x => Mapper.ToClientDTO(x));
             }
             catch (SqlException sqlEx)
             {
@@ -147,7 +150,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public void UpdateClient(Client client)
+        public void UpdateClient(ClientDTO client)
         {
             string sqlCommand = "EXEC dbo.UpdateClient @ClientId, @Firstname, @Lastname, @DriverLicenceNumber, @PersonalIdcardNumber, @Birthdate, @Gender";
 

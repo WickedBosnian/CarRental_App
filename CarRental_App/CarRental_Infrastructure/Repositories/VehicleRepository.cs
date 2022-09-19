@@ -1,6 +1,7 @@
 ﻿using CarRental_Application.Repositories;
 using CarRental_Domain.Entities;
 using CarRental_Domain.Enums;
+using CarRental_DTO;
 using CarRental_Infrastructure.Helpers;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,7 @@ namespace CarRental_Infrastructure.Repositories
             _context = context;
         }
 
-        public int CreateVehicle(Vehicle vehicle)
+        public int CreateVehicle(VehicleDTO vehicle)
         {
             int createdVehicleId = -1;
             string sqlCommand = "EXEC dbo.CreateVehicle @VehicleName, @VehicleManufacturerId, @VehicleTypeId, @Color, @DateManufactured, @PricePerDay";
@@ -83,13 +84,14 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<Vehicle> GetAllVehicles()
+        public IEnumerable<VehicleDTO> GetAllVehicles()
         {
             string sqlCommand = "EXEC dbo.GetAllVehicles";
 
             try
             {
-                return _context.Vehicles.FromSqlRaw(sqlCommand).AsEnumerable();
+                IEnumerable<Vehicle> vehicles = _context.Vehicles.FromSqlRaw(sqlCommand).AsEnumerable();
+                return vehicles.Select(x => Mapper.ToVehicleDTO(x));
             }
             catch (SqlException sqlEx)
             {
@@ -97,7 +99,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public Vehicle GetVehicleById(int id)
+        public VehicleDTO GetVehicleById(int id)
         {
             string sqlCommand = "EXEC dbo.GetVehicleById @VehicleId";
 
@@ -114,7 +116,7 @@ namespace CarRental_Infrastructure.Repositories
                     throw new Exception($"Vehicle with ID {id} was not found!");
                 }
 
-                return vehicle;
+                return Mapper.ToVehicleDTO(vehicle);
             }
             catch (SqlException sqlEx)
             {
@@ -122,7 +124,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<Vehicle> SearchVehicles(string? vehicleName, int? vehicleManufacturerId, int? vehicleTypeId)
+        public IEnumerable<VehicleDTO> SearchVehicles(string? vehicleName, int? vehicleManufacturerId, int? vehicleTypeId)
         {
             string sqlCommand = "EXEC dbo.SearchVehicles @VehicleName, @VehicleManufacturerId, @VehicleTypeId";
 
@@ -135,7 +137,8 @@ namespace CarRental_Infrastructure.Repositories
                     new SqlParameter { ParameterName = "@VehicleTypeId", Value = vehicleTypeId == null ? DBNull.Value : vehicleTypeId}
                 };
 
-                return _context.Vehicles.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable();
+                IEnumerable<Vehicle> vehicles = _context.Vehicles.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable();
+                return vehicles.Select(x => Mapper.ToVehicleDTO(x));
             }
             catch (SqlException sqlEx)
             {
@@ -143,7 +146,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public void UpdateVehicle(Vehicle vehicle)
+        public void UpdateVehicle(VehicleDTO vehicle)
         {
             string sqlCommand = "EXEC dbo.UpdateVehicle @VehicleId, @VehicleName, @VehicleManufacturerId, @VehicleTypeId, @Color, @DateManufactured, @PricePerDay";
 

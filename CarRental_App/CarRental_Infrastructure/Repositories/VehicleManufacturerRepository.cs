@@ -1,5 +1,6 @@
 ﻿using CarRental_Application.Repositories;
 using CarRental_Domain.Entities;
+using CarRental_DTO;
 using CarRental_Infrastructure.Helpers;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +20,7 @@ namespace CarRental_Infrastructure.Repositories
             _context = context;
         }
 
-        public int CreateVehicleManufacturer(VehicleManufacturer vehicleManufacturer)
+        public int CreateVehicleManufacturer(VehicleManufacturerDTO vehicleManufacturer)
         {
             int createdVehicleManufacturerId = -1;
             string sqlCommand = "EXEC dbo.CreateVehicleManufacturer @VehicleManufacturerName, @VehicleManufacturerDescription";
@@ -77,13 +78,14 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<VehicleManufacturer> GetAllVehicleManufacturers()
+        public IEnumerable<VehicleManufacturerDTO> GetAllVehicleManufacturers()
         {
             string sqlCommand = "EXEC dbo.GetAllVehicleManufacturers";
 
             try
             {
-                return _context.VehicleManufacturers.FromSqlRaw(sqlCommand).AsEnumerable();
+                IEnumerable<VehicleManufacturer> vehicleManufacturers = _context.VehicleManufacturers.FromSqlRaw(sqlCommand).AsEnumerable();
+                return vehicleManufacturers.Select(x => Mapper.ToVehicleManufacturereDTO(x));
             }
             catch (SqlException sqlEx)
             {
@@ -91,7 +93,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public VehicleManufacturer GetVehicleManufacturerById(int id)
+        public VehicleManufacturerDTO GetVehicleManufacturerById(int id)
         {
             string sqlCommand = "EXEC dbo.GetVehicleManufacturerById @VehicleManufacturerId";
 
@@ -108,7 +110,7 @@ namespace CarRental_Infrastructure.Repositories
                     throw new Exception($"Vehicle manufacturer with ID {id} was not found!");
                 }
 
-                return vehicleManufacturer;
+                return Mapper.ToVehicleManufacturereDTO(vehicleManufacturer);
             }
             catch (SqlException sqlEx)
             {
@@ -116,7 +118,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public void UpdateVehicleManufacturer(VehicleManufacturer vehicleManufacturer)
+        public void UpdateVehicleManufacturer(VehicleManufacturerDTO vehicleManufacturer)
         {
             string sqlCommand = "EXEC dbo.UpdateVehicleManufacturer @VehicleManufacturerId, @VehicleManufacturerName, @VehicleManufacturerDescription";
 

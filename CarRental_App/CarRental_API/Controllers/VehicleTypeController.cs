@@ -1,7 +1,6 @@
-﻿using CarRental_Application.Interfaces;
-using CarRental_Application.Repositories;
-using CarRental_Application.Services;
+﻿using CarRental_Application.Repositories;
 using CarRental_Domain.Entities;
+using CarRental_DTO;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -12,18 +11,18 @@ namespace CarRental_API.Controllers
     [ApiController]
     public class VehicleTypeController : ControllerBase
     {
-        private IVehicleTypeServices _vehicleTypeServices;
-        public VehicleTypeController(IVehicleTypeServices vehicleTypeServices)
+        private IVehicleTypeRepository _vehicleTypeRepository;
+        public VehicleTypeController(IVehicleTypeRepository vehicleTypeRepository)
         {
-            _vehicleTypeServices = vehicleTypeServices;
+            _vehicleTypeRepository = vehicleTypeRepository;
         }
         // GET: api/<VehicleTypeController>
         [HttpGet]
-        public ActionResult<IEnumerable<VehicleType>> Get()
+        public ActionResult<IEnumerable<VehicleTypeDTO>> Get()
         {
             try
             {
-                return Ok(_vehicleTypeServices.GetAllVehicleTypes());
+                return Ok(_vehicleTypeRepository.GetAllVehicleTypes());
             }
             catch (Exception ex)
             {
@@ -33,11 +32,11 @@ namespace CarRental_API.Controllers
 
         // GET api/<VehicleTypeController>/5
         [HttpGet("{id}")]
-        public ActionResult<VehicleType> Get(int id)
+        public ActionResult<VehicleTypeDTO> Get(int id)
         {
             try
             {
-                VehicleType vehicleType = _vehicleTypeServices.GetVehicleTypeById(id);
+                VehicleTypeDTO vehicleType = _vehicleTypeRepository.GetVehicleTypeById(id);
 
                 return Ok(vehicleType);
             }
@@ -49,11 +48,11 @@ namespace CarRental_API.Controllers
 
         // POST api/<VehicleTypeController>
         [HttpPost]
-        public ActionResult<int> Post(VehicleType vehicleType)
+        public ActionResult<int> Post(VehicleTypeDTO vehicleType)
         {
             try
             {
-                int reservationId = _vehicleTypeServices.CreateVehicleType(vehicleType);
+                int reservationId = _vehicleTypeRepository.CreateVehicleType(vehicleType);
                 if (reservationId == -1)
                 {
                     throw new Exception("There was an error. Vehicle type was not created.");
@@ -69,11 +68,11 @@ namespace CarRental_API.Controllers
 
         // PUT api/<VehicleTypeController>/5
         [HttpPut]
-        public ActionResult Put(VehicleType vehicleType)
+        public ActionResult Put(VehicleTypeDTO vehicleType)
         {
             try
             {
-                _vehicleTypeServices.UpdateVehicleType(vehicleType);
+                _vehicleTypeRepository.UpdateVehicleType(vehicleType);
                 return Ok();
             }
             catch (Exception ex)
@@ -88,7 +87,7 @@ namespace CarRental_API.Controllers
         {
             try
             {
-                return _vehicleTypeServices.DeleteVehicleType(id);
+                return _vehicleTypeRepository.DeleteVehicleType(id);
             }
             catch (Exception ex)
             {

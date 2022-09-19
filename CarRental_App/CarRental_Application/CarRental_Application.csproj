@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CarRental_Domain\CarRental_Domain.csproj" />
+    <ProjectReference Include="..\CarRental_DTO\CarRental_DTO.csproj" />
   </ItemGroup>
 
 </Project>

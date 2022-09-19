@@ -13,7 +13,6 @@ namespace CarRental_Domain.Entities
         public int VehicleManufacturerId { get; set; }
         [StringLength(200)]
         public string VehicleManufacturerName { get; set; } = null!;
-        [StringLength(1)]
         public string? VehicleManufacturerDescription { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime CreatedDate { get; set; }

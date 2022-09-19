@@ -12,17 +12,17 @@ namespace CarRental_Domain.Entities
         [Column("VehicleID")]
         public int VehicleId { get; set; }
         [Column("VehicleName")]
-        public string VehicleName { get; set; } = null!;
+        public string? VehicleName { get; set; }
         [Column("VehicleManufacturerID")]
-        public int VehicleManufacturerId { get; set; }
+        public int? VehicleManufacturerId { get; set; }
         [Column("VehicleTypeID")]
-        public int VehicleTypeId { get; set; }
+        public int? VehicleTypeId { get; set; }
         [StringLength(20)]
         public string? Color { get; set; }
         [Column(TypeName = "date")]
-        public DateTime DateManufactured { get; set; }
+        public DateTime? DateManufactured { get; set; }
         [Column(TypeName = "decimal(19, 4)")]
-        public decimal PricePerDay { get; set; }
+        public decimal? PricePerDay { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime CreatedDate { get; set; }
         [Column(TypeName = "datetime")]

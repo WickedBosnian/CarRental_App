@@ -24,6 +24,12 @@ builder.Services.AddScoped<IClientServices, ClientServices>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IReservationServices, ReservationServices>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IVehicleTypeServices, VehicleTypeServices>();
+builder.Services.AddScoped<IVehicleTypeRepository, VehicleTypeRepository>();
+builder.Services.AddScoped<IVehicleManufacturerServices, VehicleManufacturerServices>();
+builder.Services.AddScoped<IVehicleManufacturerRepository, VehicleManufacturerRepository>();
+builder.Services.AddScoped<IVehicleServices, VehicleServices>();
+builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 
 var app = builder.Build();
 

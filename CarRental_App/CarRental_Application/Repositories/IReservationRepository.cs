@@ -13,7 +13,6 @@ namespace CarRental_Application.Repositories
         IEnumerable<Reservation> SearchReservations(DateTime? dateFrom, DateTime? dateTo, int? clientId, int? vehicleId, bool? active);
         Reservation GetReservationById(int id);
         int CreateReservation(Reservation reservation);
-        int DeleteReservation(int id);
         void CancelReservation(int id);
     }
 }

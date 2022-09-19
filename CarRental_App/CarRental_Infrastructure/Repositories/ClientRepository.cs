@@ -67,7 +67,14 @@ namespace CarRental_Infrastructure.Repositories
                     new SqlParameter { ParameterName = "@ClientId", Value = id}
                 };
 
-                _context.Clients.FromSqlRaw(sqlCommand, sqlParams.ToArray());
+                SqlCommand cmd = new SqlCommand(sqlCommand, new SqlConnection(_context.Database.GetConnectionString()));
+
+                cmd.Parameters.AddRange(sqlParams.ToArray());
+                cmd.Connection.Open();
+
+                cmd.ExecuteNonQuery();
+
+                cmd.Connection.Close();
 
                 return id;
             }
@@ -102,7 +109,13 @@ namespace CarRental_Infrastructure.Repositories
                     new SqlParameter { ParameterName = "@ClientId", Value = id}
                 };
 
-                return _context.Clients.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable().First();
+                Client? client = _context.Clients.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable().FirstOrDefault();
+                if (client == null)
+                {
+                    throw new Exception($"Client with ID {id} was not found!");
+                }
+
+                return client;
             }
             catch (SqlException sqlEx)
             {

@@ -111,7 +111,13 @@ namespace CarRental_Infrastructure.Repositories
                     new SqlParameter { ParameterName = "@ReservationId", Value = id}
                 };
 
-                return _context.Reservations.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable().First();
+                Reservation? reservation = _context.Reservations.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable().FirstOrDefault();
+                if(reservation == null)
+                {
+                    throw new Exception($"Reservation with ID {id} was not found!");
+                }
+
+                return reservation;
             }
             catch (SqlException sqlEx)
             {

@@ -34,7 +34,7 @@ namespace CarRental_Infrastructure.Repositories
                     new SqlParameter { ParameterName = "@VehicleName", Value = vehicle.VehicleName},
                     new SqlParameter { ParameterName = "@VehicleManufacturerId", Value = vehicle.VehicleManufacturerId},
                     new SqlParameter { ParameterName = "@VehicleTypeId", Value = vehicle.VehicleTypeId},
-                    new SqlParameter { ParameterName = "@Color", Value = vehicle.Color},
+                    new SqlParameter { ParameterName = "@Color", Value = String.IsNullOrEmpty(vehicle.Color) ? DBNull.Value : vehicle.Color},
                     new SqlParameter { ParameterName = "@DateManufactured", Value = vehicle.DateManufactured},
                     new SqlParameter { ParameterName = "@PricePerDay", Value = vehicle.PricePerDay}
                 };

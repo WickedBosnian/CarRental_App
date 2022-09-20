@@ -10,6 +10,7 @@ namespace CarRental_DTO
     public class VehicleManufacturerDTO
     {
         public int? VehicleManufacturerId { get; set; }
+        [StringLength(200)]
         public string? VehicleManufacturerName { get; set; }
         public string? VehicleManufacturerDescription { get; set; }
     }

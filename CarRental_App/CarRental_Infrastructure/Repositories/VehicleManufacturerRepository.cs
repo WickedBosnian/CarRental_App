@@ -30,7 +30,7 @@ namespace CarRental_Infrastructure.Repositories
                 List<SqlParameter> sqlParams = new List<SqlParameter>
                 {
                     new SqlParameter { ParameterName = "@VehicleManufacturerName", Value = vehicleManufacturer.VehicleManufacturerName},
-                    new SqlParameter { ParameterName = "@VehicleManufacturerDescription", Value = vehicleManufacturer.VehicleManufacturerDescription}
+                    new SqlParameter { ParameterName = "@VehicleManufacturerDescription", Value = String.IsNullOrEmpty(vehicleManufacturer.VehicleManufacturerDescription) ? DBNull.Value : vehicleManufacturer.VehicleManufacturerDescription}
                 };
 
                 SqlCommand cmd = new SqlCommand(sqlCommand, new SqlConnection(_context.Database.GetConnectionString()));

@@ -12,6 +12,7 @@ namespace CarRental_DTO
     {
         public int? VehicleTypeId { get; set; }
         public string? VehicleTypeName { get; set; }
+        [StringLength(200)]
         public string? VehicleTypeDescription { get; set; }
     }
 }

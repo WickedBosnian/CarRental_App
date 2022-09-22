@@ -1,6 +1,5 @@
 ﻿using CarRental_Application.Repositories;
 using CarRental_Domain.Entities;
-using CarRental_Domain.Enums;
 using CarRental_DTO;
 using CarRental_Infrastructure.Helpers;
 using Microsoft.Data.SqlClient;

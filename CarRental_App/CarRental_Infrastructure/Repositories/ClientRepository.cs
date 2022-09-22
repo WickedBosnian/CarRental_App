@@ -229,9 +229,9 @@ namespace CarRental_Infrastructure.Repositories
                     new SqlParameter { ParameterName = "@Firstname", Value = String.IsNullOrEmpty(client.Firstname) ? DBNull.Value : client.Firstname},
                     new SqlParameter { ParameterName = "@Lastname", Value = String.IsNullOrEmpty(client.Lastname) ? DBNull.Value : client.Lastname},
                     new SqlParameter { ParameterName = "@DriverLicenceNumber", Value = String.IsNullOrEmpty(client.DriverLicenceNumber) ? DBNull.Value : client.DriverLicenceNumber},
-                    new SqlParameter { ParameterName = "@PersonalIdcardNumber", Value = String.IsNullOrEmpty(client.PersonalIdcardNumber) ? DBNull.Value : client.PersonalIdcardNumber},
+                    new SqlParameter { ParameterName = "@PersonalIdcardNumber", Value = String.IsNullOrEmpty(client.PersonalIdcardNumber) ? "": client.PersonalIdcardNumber},
                     new SqlParameter { ParameterName = "@Birthdate", Value = client.Birthdate == null ? DBNull.Value : client.Birthdate},
-                    new SqlParameter { ParameterName = "@Gender", Value = String.IsNullOrEmpty(client.Gender) ? DBNull.Value : client.Gender}
+                    new SqlParameter { ParameterName = "@Gender", Value = String.IsNullOrEmpty(client.Gender) ? "" : client.Gender}
                 };
 
                 SqlCommand cmd = new SqlCommand(sqlCommand, new SqlConnection(_context.Database.GetConnectionString()));

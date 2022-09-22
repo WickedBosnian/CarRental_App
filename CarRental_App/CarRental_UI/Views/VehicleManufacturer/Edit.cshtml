@@ -1,0 +1,39 @@
+﻿@model CarRental_DTO.VehicleManufacturerDTO
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit Vehicle Type</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="VehicleManufacturerId" />
+            <div class="form-group">
+                <label asp-for="VehicleManufacturerName" class="control-label"></label>
+                <input asp-for="VehicleManufacturerName" class="form-control" />
+                <span asp-validation-for="VehicleManufacturerName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="VehicleManufacturerDescription" class="control-label"></label>
+                <input asp-for="VehicleManufacturerDescription" class="form-control" />
+                <span asp-validation-for="VehicleManufacturerDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" style="margin:5px 0px 5px 0px;" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a class="btn btn-outline-dark" asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

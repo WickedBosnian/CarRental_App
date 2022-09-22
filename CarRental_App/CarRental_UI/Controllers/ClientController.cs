@@ -1,19 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using CarRental_UI.Data;
-using CarRental_UI.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 using CarRental_Application.Repositories;
 using CarRental_DTO;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Drawing.Printing;
-using CarRental_Domain.Entities;
-using System.Reflection;
-using Microsoft.AspNetCore.Http;
 
 namespace CarRental_UI.Controllers
 {
@@ -33,6 +20,11 @@ namespace CarRental_UI.Controllers
             return _clientRepository.CountOfClients();
         }
 
+        /// <summary>
+        /// Returns count of records from Client table based on search filters
+        /// </summary>
+        /// <param name="filterClient">ClientDTO object that holds filter values</param>
+        /// <returns>Count of records from Client table based on search filters</returns>
         private int CountOfClientsWithFilters(ClientDTO filterClient)
         {
             return _clientRepository.CountOfClientsWithFilters(filterClient);
@@ -68,12 +60,7 @@ namespace CarRental_UI.Controllers
                 if (filterOn)
                 {
                     ISession session = HttpContext.Session;
-                    ClientDTO FilterClient = new ClientDTO();
-                    FilterClient.Firstname = session.GetString("filter_Firstname");
-                    FilterClient.Lastname = session.GetString("filter_Lastname");
-                    FilterClient.Gender = session.GetString("filter_Gender");
-                    FilterClient.Birthdate = String.IsNullOrEmpty(session.GetString("filter_Birthdate")) ? null : DateTime.Parse(session.GetString("filter_Birthdate"));
-                    FilterClient.DriverLicenceNumber = session.GetString("filter_DriverLicenceNumber");
+                    ClientDTO FilterClient = SetFilterClientFromSearchFiltersInSession();
 
                     if (ArePropertiesNull(FilterClient))
                     {
@@ -125,6 +112,11 @@ namespace CarRental_UI.Controllers
             }
         }
 
+        /// <summary>
+        /// This action calls GetClientsByFilters service that returns records from Client table based on search filters
+        /// </summary>
+        /// <param name="filterClient">ClientDTO object that holds filter values</param>
+        /// <returns>If the filter values in ClientDTO object are all null then it returns empty index page, otherwise it returns records from Client table based on filter values</returns>
         public IActionResult SearchClient(ClientDTO filterClient)
         {
             if (ArePropertiesNull(filterClient))
@@ -138,12 +130,7 @@ namespace CarRental_UI.Controllers
 
             GlobalClients = _clientRepository.GetClientsByFilters(filterClient, 1, RowsPerPage).ToList();
 
-            ISession session = HttpContext.Session;
-            session.SetString("filter_Firstname", String.IsNullOrEmpty(filterClient.Firstname) ? "" : filterClient.Firstname);
-            session.SetString("filter_Lastname", String.IsNullOrEmpty(filterClient.Lastname) ? "" : filterClient.Lastname);
-            session.SetString("filter_Gender", String.IsNullOrEmpty(filterClient.Gender) ? "" : filterClient.Gender);
-            session.SetString("filter_Birthdate", filterClient.Birthdate != null ? filterClient.Birthdate.Value.ToShortDateString() : "");
-            session.SetString("filter_DriverLicenceNumber", String.IsNullOrEmpty(filterClient.DriverLicenceNumber) ? "" : filterClient.DriverLicenceNumber);
+            SetSearchFiltersInSession(filterClient);
 
             int clientsCount = CountOfClientsWithFilters(filterClient);
 
@@ -180,14 +167,14 @@ namespace CarRental_UI.Controllers
         /// <returns>Details View</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("ClientId,Firstname,Lastname,Birthdate,Gender,DriverLicenceNumber,PersonalIdcardNumber")] ClientDTO client)
+        public IActionResult Create(ClientDTO client)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
                     int clientId = _clientRepository.CreateClient(client);
-                    return Redirect($"Details/{clientId}");
+                    return RedirectToAction("Details", new { id = clientId });
                 }
                 return View(client);
             }
@@ -232,7 +219,7 @@ namespace CarRental_UI.Controllers
         /// <returns>Details Action</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int? id, [Bind("ClientId,Firstname,Lastname,Birthdate,Gender,DriverLicenceNumber,PersonalIdcardNumber")] ClientDTO client)
+        public IActionResult Edit(int? id, ClientDTO client)
         {
             try
             {
@@ -245,7 +232,8 @@ namespace CarRental_UI.Controllers
                 {
                     _clientRepository.UpdateClient(client);
 
-                    return Redirect($"Details/{id}");
+                    return RedirectToAction("Details", new { id = id});
+                    //return Redirect($"Client/Details/{id}");
                 }
 
                 return View(client);
@@ -309,6 +297,38 @@ namespace CarRental_UI.Controllers
             {
                 return BadRequest(ex.Message + "; " + ex.InnerException?.Message);
             }
+        }
+
+        /// <summary>
+        /// Sets ClientDTO object for filtering records from Client table
+        /// </summary>
+        /// <returns>ClientDTO object with filter values</returns>
+        private ClientDTO SetFilterClientFromSearchFiltersInSession()
+        {
+            ISession session = HttpContext.Session;
+
+            ClientDTO FilterClient = new ClientDTO();
+            FilterClient.Firstname = session.GetString("filter_Firstname");
+            FilterClient.Lastname = session.GetString("filter_Lastname");
+            FilterClient.Gender = session.GetString("filter_Gender");
+            FilterClient.Birthdate = String.IsNullOrEmpty(session.GetString("filter_Birthdate")) ? null : DateTime.Parse(session.GetString("filter_Birthdate"));
+            FilterClient.DriverLicenceNumber = session.GetString("filter_DriverLicenceNumber");
+
+            return FilterClient;
+        }
+
+        /// <summary>
+        /// Sets session filter parameters
+        /// </summary>
+        /// <param name="filterClient">ClientDTO object that holds filter values</param>
+        private void SetSearchFiltersInSession(ClientDTO filterClient)
+        {
+            ISession session = HttpContext.Session;
+            session.SetString("filter_Firstname", String.IsNullOrEmpty(filterClient.Firstname) ? "" : filterClient.Firstname);
+            session.SetString("filter_Lastname", String.IsNullOrEmpty(filterClient.Lastname) ? "" : filterClient.Lastname);
+            session.SetString("filter_Gender", String.IsNullOrEmpty(filterClient.Gender) ? "" : filterClient.Gender);
+            session.SetString("filter_Birthdate", filterClient.Birthdate != null ? filterClient.Birthdate.Value.ToShortDateString() : "");
+            session.SetString("filter_DriverLicenceNumber", String.IsNullOrEmpty(filterClient.DriverLicenceNumber) ? "" : filterClient.DriverLicenceNumber);
         }
     }
 }

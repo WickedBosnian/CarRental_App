@@ -1,0 +1,40 @@
+﻿@model CarRental_DTO.VehicleTypeDTO
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Vehicle Type</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="VehicleTypeName" class="control-label"></label>
+                <input asp-for="VehicleTypeName" class="form-control" />
+                <span asp-validation-for="VehicleTypeName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="VehicleTypeDescription" class="control-label"></label>
+                <input asp-for="VehicleTypeDescription" class="form-control" />
+                <span asp-validation-for="VehicleTypeDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" style="margin:5px 0px 5px 0px;" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a class="btn btn-outline-dark" asp-action="Index">Back to List</a>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

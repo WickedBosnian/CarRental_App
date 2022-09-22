@@ -1,0 +1,32 @@
+﻿@model CarRental_DTO.VehicleTypeDTO
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Vehicle Type Details</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.VehicleTypeName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.VehicleTypeName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.VehicleTypeDescription)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.VehicleTypeDescription)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" style="margin:5px 0px 5px 0px;" class="btn btn-outline-warning" asp-route-id="@Model?.VehicleTypeId">Edit</a>
+</div>
+
+<div>
+    <a class="btn btn-outline-dark" asp-action="Index">Back to List</a>
+</div>

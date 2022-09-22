@@ -11,6 +11,7 @@ namespace CarRental_DTO
 {
     public class ClientDTO
     {
+        [Key]
         public int? ClientId { get; set; }
         [StringLength(200), Required]
         public string? Firstname { get; set; }

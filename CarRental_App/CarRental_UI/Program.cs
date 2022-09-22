@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using CarRental_UI.Data;
 using CarRental_Application.Repositories;
 using CarRental_Infrastructure.Helpers;
 using CarRental_Infrastructure.Repositories;

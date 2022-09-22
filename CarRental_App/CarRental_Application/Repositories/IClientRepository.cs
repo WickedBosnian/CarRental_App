@@ -12,10 +12,11 @@ namespace CarRental_Application.Repositories
     {
         IEnumerable<ClientDTO> GetAllClients(int pageNumber, int rowsPerPage);
         ClientDTO GetClientById(int id);
-        IEnumerable<ClientDTO> GetClientsByFilters(ClientDTO client);
+        IEnumerable<ClientDTO> GetClientsByFilters(ClientDTO client, int pageNumber, int rowsPerPage);
         int CreateClient(ClientDTO client);
         void UpdateClient(ClientDTO client);
         int DeleteClient(int id);
         int CountOfClients();
+        int CountOfClientsWithFilters(ClientDTO filterClient);
     }
 }

@@ -12,22 +12,30 @@ using CarRental_DTO;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Drawing.Printing;
 using CarRental_Domain.Entities;
+using System.Reflection;
+using Microsoft.AspNetCore.Http;
 
 namespace CarRental_UI.Controllers
 {
     public class ClientController : Controller
     {
         private readonly IClientRepository _clientRepository;
-        //private int? ClientsCount;
-        private readonly int RowsPerPage = 5;
+        private readonly int RowsPerPage = 2;
+        private List<ClientDTO> GlobalClients = new List<ClientDTO>();
+
         public ClientController(IClientRepository clientRepository)
         {
             _clientRepository = clientRepository;
         }
 
-        public int CountOfClients()
+        private int CountOfClients()
         {
             return _clientRepository.CountOfClients();
+        }
+
+        private int CountOfClientsWithFilters(ClientDTO filterClient)
+        {
+            return _clientRepository.CountOfClientsWithFilters(filterClient);
         }
 
         /// <summary>
@@ -37,12 +45,12 @@ namespace CarRental_UI.Controllers
         /// <param name="addedNewRecord">If a new record CountOfClients is called and new count is retreived</param>
         /// <param name="clientsCount">Count of clients from DB</param>
         /// <returns>Index view of clients</returns>
-        public IActionResult Index(int pageNumber = 1, bool addedNewRecord = false, int clientsCount = 0)
+        public IActionResult Index(int pageNumber = 1, bool filterOn = false, int clientsCount = 0)
         {
             try
             {
                 //Checks if count of clients should be updated from DB
-                if (clientsCount == 0 || addedNewRecord)
+                if (clientsCount == 0)
                 {
                     clientsCount = CountOfClients();
 
@@ -57,9 +65,31 @@ namespace CarRental_UI.Controllers
                 this.ViewBag.PageNumber = pageNumber;
                 this.ViewBag.ClientsCount = clientsCount;
 
-                List<ClientDTO> clients = _clientRepository.GetAllClients(pageNumber, RowsPerPage).ToList();
+                if (filterOn)
+                {
+                    ISession session = HttpContext.Session;
+                    ClientDTO FilterClient = new ClientDTO();
+                    FilterClient.Firstname = session.GetString("filter_Firstname");
+                    FilterClient.Lastname = session.GetString("filter_Lastname");
+                    FilterClient.Gender = session.GetString("filter_Gender");
+                    FilterClient.Birthdate = String.IsNullOrEmpty(session.GetString("filter_Birthdate")) ? null : DateTime.Parse(session.GetString("filter_Birthdate"));
+                    FilterClient.DriverLicenceNumber = session.GetString("filter_DriverLicenceNumber");
 
-                return View(clients);
+                    if (ArePropertiesNull(FilterClient))
+                    {
+                        return View(GlobalClients);
+                    }
+
+                    this.ViewBag.FilterOn = filterOn;
+                    GlobalClients = _clientRepository.GetClientsByFilters(FilterClient, pageNumber, RowsPerPage).ToList();
+                    this.ViewData["FilterClient"] = FilterClient;
+                }
+                else
+                {
+                    GlobalClients = _clientRepository.GetAllClients(pageNumber, RowsPerPage).ToList();
+                }
+
+                return View(GlobalClients);
             }
             catch (Exception ex)
             {
@@ -95,12 +125,43 @@ namespace CarRental_UI.Controllers
             }
         }
 
-        public IActionResult SearchClient(DateTime? birthdate, string? firstname, string? lastname, string? driverLicenceNumber, string? gender)
+        public IActionResult SearchClient(ClientDTO filterClient)
         {
-            List<ClientDTO> clients = new List<ClientDTO>();
+            if (ArePropertiesNull(filterClient))
+            {
+                this.ViewBag.MaxPage = 1;
+                this.ViewBag.PageNumber = 1;
+                this.ViewBag.ClientsCount = 0;
 
+                return View("Index", GlobalClients);
+            }
 
-            return RedirectToAction(nameof(Index), new { clients = clients });
+            GlobalClients = _clientRepository.GetClientsByFilters(filterClient, 1, RowsPerPage).ToList();
+
+            ISession session = HttpContext.Session;
+            session.SetString("filter_Firstname", String.IsNullOrEmpty(filterClient.Firstname) ? "" : filterClient.Firstname);
+            session.SetString("filter_Lastname", String.IsNullOrEmpty(filterClient.Lastname) ? "" : filterClient.Lastname);
+            session.SetString("filter_Gender", String.IsNullOrEmpty(filterClient.Gender) ? "" : filterClient.Gender);
+            session.SetString("filter_Birthdate", filterClient.Birthdate != null ? filterClient.Birthdate.Value.ToShortDateString() : "");
+            session.SetString("filter_DriverLicenceNumber", String.IsNullOrEmpty(filterClient.DriverLicenceNumber) ? "" : filterClient.DriverLicenceNumber);
+
+            int clientsCount = CountOfClientsWithFilters(filterClient);
+
+            this.ViewBag.MaxPage = (clientsCount / RowsPerPage) - (clientsCount % RowsPerPage == 0 ? 1 : 0) + 1;
+            this.ViewBag.PageNumber = 1;
+            this.ViewBag.ClientsCount = clientsCount;
+            this.ViewBag.FilterOn = true;
+            this.ViewData["FilterClient"] = filterClient;
+
+            return View("Index", GlobalClients);
+        }
+
+        private bool ArePropertiesNull(object myObject)
+        {
+            return !myObject.GetType()
+                             .GetProperties()
+                             .Select(pi => pi.GetValue(myObject))
+                             .Any(value => value != null);
         }
 
         /// <summary>

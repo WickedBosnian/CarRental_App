@@ -46,7 +46,7 @@ namespace CarRental_API.Controllers
                     Gender = gender
                 };
 
-                return Ok(_clientRepository.GetClientsByFilters(client));
+                return Ok(_clientRepository.GetClientsByFilters(client, 1, 10));
             }
             catch (Exception ex)
             {

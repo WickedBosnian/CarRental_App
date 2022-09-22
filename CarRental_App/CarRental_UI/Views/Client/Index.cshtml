@@ -1,16 +1,34 @@
 ﻿@model IEnumerable<CarRental_DTO.ClientDTO>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Clients";
 }
-
-<h1>Index</h1>
-
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-outline-primary">Create New</a>
 </p>
-<table class="table">
-    <thead>
+
+
+<form asp-controller="Client" asp-action="SearchClient" method="get">
+    <p>
+        Title: <input type="text" name="Firstname" />
+        <input type="submit" value="firstname" />
+    </p>
+</form>
+
+@using (Html.BeginForm("SearchClient", "Client", FormMethod.Post))
+    {
+        <div class="input-group">
+        @*@Html.TextBoxFor(m => m.)*@
+            <input id="firstname"type="search" class="form-control rounded" style="margin:5px;" placeholder="Firstname" aria-label="Search" aria-describedby="search-addon" />
+            <input id="lastname" type="search" class="form-control rounded" style="margin:5px;" placeholder="Lastname" aria-label="Search" aria-describedby="search-addon" />
+            <input id="driverLicenceNumber" type="search" class="form-control rounded" style="margin:5px;" placeholder="Driver Licence Number" aria-label="Search" aria-describedby="search-addon" />
+            <input id="birthdate" type="date" class="form-control rounded" style="margin:5px;" placeholder="Birthdate" aria-label="Search" aria-describedby="search-addon" />
+            <input id="gender" type="search" class="form-control rounded" style="margin:5px;" placeholder="Gender" aria-label="Search" aria-describedby="search-addon" />
+            <button type="submit" class="btn btn-outline-primary"  onclick="contractSearch();">search</button>
+        </div>
+}
+<table class="table align-middle mb-0 bg-white table-hover">
+    <thead class="bg-light">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Firstname)
@@ -55,11 +73,89 @@
                 @Html.DisplayFor(modelItem => item.PersonalIdcardNumber)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ClientId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ClientId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ClientId">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.ClientId" class="btn btn-outline-warning">Edit</a>
+                <a asp-action="Details" asp-route-id="@item.ClientId" class="btn btn-outline-info">Details</a>
+                <a asp-action="Delete" asp-route-id="@item.ClientId" class="btn btn-outline-danger">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
+
+<nav aria-label="Page navigation example" style="margin-top:10px;">
+    <ul class="pagination justify-content-center">
+        @if (ViewBag.PageNumber > 1)
+        {
+            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { pageNumber = ViewBag.PageNumber - 1, clientsCount = ViewBag.ClientsCount })" tabindex="-1">Previous</a></li>
+        }else{
+            <li class="page-item disabled"><a class="page-link" href="@Url.Action("Index", new { pageNumber = ViewBag.PageNumber - 1, clientsCount = ViewBag.ClientsCount })" tabindex="-1">Previous</a></li>
+        }
+
+        @{
+            int counter = ViewBag.PageNumber > 1 ? ViewBag.PageNumber - 1 : ViewBag.PageNumber;
+            int tempMaxPage = ViewBag.MaxPage < 3 ? ViewBag.MaxPage : 3;
+            if (ViewBag.PageNumber == ViewBag.MaxPage && ViewBag.PageNumber > 2)
+            {
+                counter--;
+            }
+
+            if (counter > 1)
+            {
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { pageNumber = 1, clientsCount = ViewBag.ClientsCount })">...</a></li>
+            }
+
+            for (int i = 0; i < tempMaxPage; i++)
+            {
+                if (ViewBag.PageNumber == counter)
+                {
+                                <li class="page-item active"><a class="page-link" href="@Url.Action("Index", new { pageNumber = @counter, clientsCount = ViewBag.ClientsCount })">@counter</a></li>
+                }else
+                {
+                                <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { pageNumber = @counter, clientsCount = ViewBag.ClientsCount })">@counter</a></li>
+                }
+                
+                counter++;
+            }
+
+            if (counter - 1 < ViewBag.MaxPage && ViewBag.MaxPage > 2)
+            {
+                            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { pageNumber = ViewBag.MaxPage, clientsCount = ViewBag.ClientsCount })">...</a></li>
+            }
+        }
+
+        @if (ViewBag.PageNumber < ViewBag.MaxPage)
+        {
+            <li class="page-item"><a class="page-link" href="@Url.Action("Index", new { pageNumber = ViewBag.PageNumber + 1, clientsCount = ViewBag.ClientsCount })">Next</a></li>
+        }else{
+            <li class="page-item disabled"><a class="page-link" href="@Url.Action("Index", new { pageNumber = ViewBag.PageNumber + 1, clientsCount = ViewBag.ClientsCount })">Next</a></li>
+        }
+    </ul>
+</nav>
+
+
+<script>
+    function contractSearch(e) {
+
+        if (e == null || e.keyCode == 13) {
+
+            let firstaname = $("#firstname").val();
+            let lastname = $("#lastname").val();
+            let driverLicenceNumber = $("#driverLicenceNumber").val();
+            let birthdate = $("#birthdate").val();
+            let gender = $("#gender").val();
+
+            //onBegin("contractContainer");
+
+            $.ajax({
+                url: `Client/SearchClient?birthdate=${birthdate}&firstname=${firstaname}&lastname=${lastname}&driverLicenceNumber=${driverLicenceNumber}&gender=${gender}`,
+                type: "GET",
+                success: (data) => {
+                    window.location.
+                },
+                error: (error) => {
+                    console.log(error);
+                }
+            });
+        }
+    }
+</script>

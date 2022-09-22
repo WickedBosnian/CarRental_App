@@ -11,7 +11,7 @@ namespace CarRental_Application.Repositories
     public interface IReservationRepository
     {
         IEnumerable<ReservationDTO> GetAllReservations();
-        IEnumerable<ReservationDTO> SearchReservations(DateTime? dateFrom, DateTime? dateTo, int? clientId, int? vehicleId, bool? active);
+        IEnumerable<ReservationDTO> SearchReservations(ReservationDTO reservation);
         ReservationDTO GetReservationById(int id);
         int CreateReservation(ReservationDTO reservation);
         void CancelReservation(int id);

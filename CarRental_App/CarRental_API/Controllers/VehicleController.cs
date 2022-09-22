@@ -41,7 +41,13 @@ namespace CarRental_API.Controllers
         {
             try
             {
-                return Ok(_vehicleRepository.SearchVehicles(vehicleName, vehicleManufacturerId, vehicleTypeId));
+                VehicleDTO vehicle = new VehicleDTO()
+                {
+                    VehicleName = vehicleName,
+                    VehicleManufacturerId = vehicleManufacturerId,
+                    VehicleTypeId = vehicleTypeId
+                };
+                return Ok(_vehicleRepository.SearchVehicles(vehicle));
             }
             catch (Exception ex)
             {

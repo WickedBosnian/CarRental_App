@@ -36,7 +36,17 @@ namespace CarRental_API.Controllers
         {
             try
             {
-                return Ok(_clientRepository.GetClientsByFilters(birthdate, firstname, lastname, driverLicenceNumber, personalIdCardNumber, gender));
+                ClientDTO client = new ClientDTO()
+                {
+                    Birthdate = birthdate,
+                    Firstname = firstname,
+                    Lastname = lastname,
+                    DriverLicenceNumber = driverLicenceNumber,
+                    PersonalIdcardNumber = personalIdCardNumber,
+                    Gender = gender
+                };
+
+                return Ok(_clientRepository.GetClientsByFilters(client));
             }
             catch (Exception ex)
             {
@@ -49,7 +59,7 @@ namespace CarRental_API.Controllers
         {
             try
             {
-                return Ok(_clientRepository.GetAllClients());
+                return Ok(_clientRepository.GetAllClients(1, 10));
             }
             catch (Exception ex)
             {

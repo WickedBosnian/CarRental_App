@@ -23,6 +23,32 @@ namespace CarRental_Infrastructure.Repositories
             _context = context;
         }
 
+        /// <summary>
+        /// This method calls a function from DB that returns count of records from table Client
+        /// </summary>
+        public int CountOfClients()
+        {
+            int countOfClients = -1;
+            string sqlCommand = "SELECT dbo.CountOfClients()";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(sqlCommand, new SqlConnection(_context.Database.GetConnectionString()));
+
+                cmd.Connection.Open();
+
+                countOfClients = (int)cmd.ExecuteScalar();
+
+                cmd.Connection.Close();
+
+                return countOfClients;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception(sqlEx.Message + ";" + sqlEx.InnerException?.Message);
+            }
+        }
+
         public int CreateClient(ClientDTO client)
         {
             int createdClientId = -1;
@@ -85,13 +111,19 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<ClientDTO> GetAllClients()
+        public IEnumerable<ClientDTO> GetAllClients(int pageNumber = 1, int rowsPerPage = 10)
         {
-            string sqlCommand = "EXEC dbo.GetAllClients";
+            string sqlCommand = "EXEC dbo.GetAllClients @PageNumber, @RowsPerPage";
 
             try
             {
-                IEnumerable<Client> clients = _context.Clients.FromSqlRaw(sqlCommand).AsEnumerable();
+                List<SqlParameter> sqlParams = new List<SqlParameter>
+                {
+                    new SqlParameter { ParameterName = "@PageNumber", Value = pageNumber },
+                    new SqlParameter { ParameterName = "@RowsPerPage", Value = rowsPerPage }
+                };
+
+                IEnumerable<Client> clients = _context.Clients.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable();
                 return clients.Select(x => Mapper.ToClientDTO(x));
             }
             catch (SqlException sqlEx)
@@ -125,7 +157,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<ClientDTO> GetClientsByFilters(DateTime? birthdate, string? firstname, string? lastname, string? driverLicenceNumber, string? personalIdCardNumber, string? gender)
+        public IEnumerable<ClientDTO> GetClientsByFilters(ClientDTO client)
         {
             string sqlCommand = "EXEC dbo.GetClientsByFilters @Firstname, @Lastname, @DriverLicenceNumber, @PersonalIDCardNumber, @Birthdate, @Gender";
 
@@ -133,12 +165,12 @@ namespace CarRental_Infrastructure.Repositories
             {
                 List<SqlParameter> sqlParams = new List<SqlParameter>
                 {
-                    new SqlParameter { ParameterName = "@Firstname", Value = String.IsNullOrEmpty(firstname) ? DBNull.Value : firstname},
-                    new SqlParameter { ParameterName = "@Lastname", Value = String.IsNullOrEmpty(lastname) ? DBNull.Value : lastname},
-                    new SqlParameter { ParameterName = "@DriverLicenceNumber", Value = String.IsNullOrEmpty(driverLicenceNumber) ? DBNull.Value : driverLicenceNumber},
-                    new SqlParameter { ParameterName = "@PersonalIdcardNumber", Value = String.IsNullOrEmpty(personalIdCardNumber) ? DBNull.Value : personalIdCardNumber},
-                    new SqlParameter { ParameterName = "@Birthdate", Value = birthdate == null ? DBNull.Value : birthdate},
-                    new SqlParameter { ParameterName = "@Gender", Value = String.IsNullOrEmpty(gender) ? DBNull.Value : gender}
+                    new SqlParameter { ParameterName = "@Firstname", Value = String.IsNullOrEmpty(client.Firstname) ? DBNull.Value : client.Firstname},
+                    new SqlParameter { ParameterName = "@Lastname", Value = String.IsNullOrEmpty(client.Lastname) ? DBNull.Value : client.Lastname},
+                    new SqlParameter { ParameterName = "@DriverLicenceNumber", Value = String.IsNullOrEmpty(client.DriverLicenceNumber) ? DBNull.Value : client.DriverLicenceNumber},
+                    new SqlParameter { ParameterName = "@PersonalIdcardNumber", Value = String.IsNullOrEmpty(client.PersonalIdcardNumber) ? DBNull.Value : client.PersonalIdcardNumber},
+                    new SqlParameter { ParameterName = "@Birthdate", Value = client.Birthdate == null ? DBNull.Value : client.Birthdate},
+                    new SqlParameter { ParameterName = "@Gender", Value = String.IsNullOrEmpty(client.Gender) ? DBNull.Value : client.Gender}
                 };
 
                 IEnumerable<Client> clients = _context.Clients.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable();

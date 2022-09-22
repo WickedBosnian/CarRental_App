@@ -39,7 +39,16 @@ namespace CarRental_API.Controllers
         {
             try
             {
-                return Ok(_reservationRepository.SearchReservations(dateFrom, dateTo, clientId, vehicleId, active));
+                ReservationDTO reservation = new ReservationDTO()
+                {
+                    ReservationDateFrom = dateFrom,
+                    ReservationDateTo = dateTo,
+                    ClientId = clientId,
+                    VehicleID = vehicleId,
+                    Active = active
+                };
+
+                return Ok(_reservationRepository.SearchReservations(reservation));
             }
             catch (Exception ex)
             {

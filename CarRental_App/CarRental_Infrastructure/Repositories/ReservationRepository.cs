@@ -127,7 +127,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<ReservationDTO> SearchReservations(DateTime? dateFrom, DateTime? dateTo, int? clientId, int? vehicleId, bool? active)
+        public IEnumerable<ReservationDTO> SearchReservations(ReservationDTO reservation)
         {
             string sqlCommand = "EXEC dbo.SearchReservations @DateFrom, @DateTo, @ClientId, @VehicleId, @Active";
 
@@ -135,11 +135,11 @@ namespace CarRental_Infrastructure.Repositories
             {
                 List<SqlParameter> sqlParams = new List<SqlParameter>
                 {
-                    new SqlParameter { ParameterName = "@DateFrom", Value = dateFrom == null ? DBNull.Value : dateFrom},
-                    new SqlParameter { ParameterName = "@DateTo", Value = dateTo == null ? DBNull.Value : dateTo},
-                    new SqlParameter { ParameterName = "@ClientId", Value = clientId == null ? DBNull.Value : clientId},
-                    new SqlParameter { ParameterName = "@VehicleId", Value = vehicleId == null ? DBNull.Value : vehicleId},
-                    new SqlParameter { ParameterName = "@Active", Value = active == null ? DBNull.Value : active}
+                    new SqlParameter { ParameterName = "@DateFrom", Value = reservation.ReservationDateFrom == null ? DBNull.Value : reservation.ReservationDateFrom},
+                    new SqlParameter { ParameterName = "@DateTo", Value = reservation.ReservationDateTo == null ? DBNull.Value : reservation.ReservationDateTo},
+                    new SqlParameter { ParameterName = "@ClientId", Value = reservation.ClientId == null ? DBNull.Value : reservation.ClientId},
+                    new SqlParameter { ParameterName = "@VehicleId", Value = reservation.VehicleID == null ? DBNull.Value : reservation.VehicleID},
+                    new SqlParameter { ParameterName = "@Active", Value = reservation.Active == null ? DBNull.Value : reservation.Active}
                 };
 
                 IEnumerable<Reservation> reservations = _context.Reservations.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable();

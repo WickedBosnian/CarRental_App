@@ -11,7 +11,7 @@ namespace CarRental_Application.Repositories
     public interface IVehicleRepository
     {
         IEnumerable<VehicleDTO> GetAllVehicles();
-        IEnumerable<VehicleDTO> SearchVehicles(string? vehicleName, int? vehicleManufacturerId, int? vehicleTypeId);
+        IEnumerable<VehicleDTO> SearchVehicles(VehicleDTO vehicle);
         VehicleDTO GetVehicleById(int id);
         int CreateVehicle(VehicleDTO vehicle);
         void UpdateVehicle(VehicleDTO vehicle);

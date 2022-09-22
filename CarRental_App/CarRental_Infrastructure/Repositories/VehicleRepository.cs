@@ -124,7 +124,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<VehicleDTO> SearchVehicles(string? vehicleName, int? vehicleManufacturerId, int? vehicleTypeId)
+        public IEnumerable<VehicleDTO> SearchVehicles(VehicleDTO vehicle)
         {
             string sqlCommand = "EXEC dbo.SearchVehicles @VehicleName, @VehicleManufacturerId, @VehicleTypeId";
 
@@ -132,9 +132,9 @@ namespace CarRental_Infrastructure.Repositories
             {
                 List<SqlParameter> sqlParams = new List<SqlParameter>
                 {
-                    new SqlParameter { ParameterName = "@VehicleName", Value = String.IsNullOrEmpty(vehicleName) ? DBNull.Value : vehicleName},
-                    new SqlParameter { ParameterName = "@VehicleManufacturerId", Value = vehicleManufacturerId == null ? DBNull.Value : vehicleManufacturerId},
-                    new SqlParameter { ParameterName = "@VehicleTypeId", Value = vehicleTypeId == null ? DBNull.Value : vehicleTypeId}
+                    new SqlParameter { ParameterName = "@VehicleName", Value = String.IsNullOrEmpty(vehicle.VehicleName) ? DBNull.Value : vehicle.VehicleName},
+                    new SqlParameter { ParameterName = "@VehicleManufacturerId", Value = vehicle.VehicleManufacturerId == null ? DBNull.Value : vehicle.VehicleManufacturerId},
+                    new SqlParameter { ParameterName = "@VehicleTypeId", Value = vehicle.VehicleTypeId == null ? DBNull.Value : vehicle.VehicleTypeId}
                 };
 
                 IEnumerable<Vehicle> vehicles = _context.Vehicles.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable();

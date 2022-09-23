@@ -47,7 +47,7 @@ namespace CarRental_API.Controllers
                     VehicleManufacturerId = vehicleManufacturerId,
                     VehicleTypeId = vehicleTypeId
                 };
-                return Ok(_vehicleRepository.SearchVehicles(vehicle));
+                return Ok(_vehicleRepository.SearchVehicles(vehicle, 1, 10));
             }
             catch (Exception ex)
             {
@@ -63,8 +63,16 @@ namespace CarRental_API.Controllers
             {
                 VehicleDTO vehicle = _vehicleRepository.GetVehicleById(id);
 
-                vehicle.VehicleType = _vehicleTypeRepository.GetVehicleTypeById((int)vehicle.VehicleTypeId);
-                vehicle.VehicleManufacturer = _vehicleManufacturerRepository.GetVehicleManufacturerById((int)vehicle.VehicleManufacturerId);
+
+                if (vehicle.VehicleTypeId != null)
+                {
+                    vehicle.VehicleType = _vehicleTypeRepository.GetVehicleTypeById((int)vehicle.VehicleTypeId);
+                }
+
+                if (vehicle.VehicleManufacturerId != null)
+                {
+                    vehicle.VehicleManufacturer = _vehicleManufacturerRepository.GetVehicleManufacturerById((int)vehicle.VehicleManufacturerId);
+                }
 
                 return Ok(vehicle);
             }
@@ -80,13 +88,13 @@ namespace CarRental_API.Controllers
         {
             try
             {
-                int clientId = _vehicleRepository.CreateVehicle(vehicle);
-                if (clientId == -1)
+                int vehicleId = _vehicleRepository.CreateVehicle(vehicle);
+                if (vehicleId == -1)
                 {
                     throw new Exception("There was an error. Vehicle was not created.");
                 }
 
-                return Ok(clientId);
+                return Ok(vehicleId);
             }
             catch (Exception ex)
             {

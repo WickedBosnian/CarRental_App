@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CarRental_Application.Repositories;
+using CarRental_Application.Common;
 using CarRental_DTO;
 
 namespace CarRental_UI.Controllers
@@ -8,13 +9,18 @@ namespace CarRental_UI.Controllers
     {
         private readonly IClientRepository _clientRepository;
         private readonly int RowsPerPage = 2;
-        private List<ClientDTO> GlobalClients = new List<ClientDTO>();
+        private IEnumerable<ClientDTO> GlobalClients;
 
         public ClientController(IClientRepository clientRepository)
         {
             _clientRepository = clientRepository;
+            GlobalClients = new List<ClientDTO>();
         }
 
+        /// <summary>
+        /// Calls service CountOfClients that returns total number of records from Client table
+        /// </summary>
+        /// <returns>Number of records in Client table</returns>
         private int CountOfClients()
         {
             return _clientRepository.CountOfClients();
@@ -34,46 +40,46 @@ namespace CarRental_UI.Controllers
         /// Index action, calls GetAllClients service which retreives all clients based on pagination
         /// </summary>
         /// <param name="pageNumber">Value of current page on pagination</param>
-        /// <param name="addedNewRecord">If a new record CountOfClients is called and new count is retreived</param>
-        /// <param name="clientsCount">Count of clients from DB</param>
+        /// <param name="filterOn">If filterOn is true then SearchClients is called for getting clients otherwise GetClientsForPagination is called for getting clients</param>
+        /// <param name="rowsCount">Total number of rows for showing in pagination</param>
         /// <returns>Index view of clients</returns>
-        public IActionResult Index(int pageNumber = 1, bool filterOn = false, int clientsCount = 0)
+        public IActionResult Index(int pageNumber = 1, bool filterOn = false, int rowsCount = 0)
         {
             try
             {
                 //Checks if count of clients should be updated from DB
-                if (clientsCount == 0)
+                if (rowsCount == 0)
                 {
-                    clientsCount = CountOfClients();
+                    rowsCount = CountOfClients();
 
-                    if (clientsCount == 0)
+                    if (rowsCount == 0)
                     {
                         return View(new ClientDTO());
                     }
                 }
 
                 //Calculates maximum number of pages
-                this.ViewBag.MaxPage = (clientsCount / RowsPerPage) - (clientsCount % RowsPerPage == 0 ? 1 : 0) + 1;
+                this.ViewBag.MaxPage = (rowsCount / RowsPerPage) - (rowsCount % RowsPerPage == 0 ? 1 : 0) + 1;
                 this.ViewBag.PageNumber = pageNumber;
-                this.ViewBag.ClientsCount = clientsCount;
+                this.ViewBag.RowsCount = rowsCount;
 
                 if (filterOn)
                 {
                     ISession session = HttpContext.Session;
                     ClientDTO FilterClient = SetFilterClientFromSearchFiltersInSession();
 
-                    if (ArePropertiesNull(FilterClient))
+                    if (CommonFunctions.ArePropertiesNull(FilterClient))
                     {
                         return View(GlobalClients);
                     }
 
                     this.ViewBag.FilterOn = filterOn;
-                    GlobalClients = _clientRepository.GetClientsByFilters(FilterClient, pageNumber, RowsPerPage).ToList();
+                    GlobalClients = _clientRepository.SearchClients(FilterClient, pageNumber, RowsPerPage);
                     this.ViewData["FilterClient"] = FilterClient;
                 }
                 else
                 {
-                    GlobalClients = _clientRepository.GetAllClients(pageNumber, RowsPerPage).ToList();
+                    GlobalClients = _clientRepository.GetClientsForPagination(pageNumber, RowsPerPage);
                 }
 
                 return View(GlobalClients);
@@ -117,18 +123,18 @@ namespace CarRental_UI.Controllers
         /// </summary>
         /// <param name="filterClient">ClientDTO object that holds filter values</param>
         /// <returns>If the filter values in ClientDTO object are all null then it returns empty index page, otherwise it returns records from Client table based on filter values</returns>
-        public IActionResult SearchClient(ClientDTO filterClient)
+        public IActionResult SearchClients(ClientDTO filterClient)
         {
-            if (ArePropertiesNull(filterClient))
+            if (CommonFunctions.ArePropertiesNull(filterClient))
             {
                 this.ViewBag.MaxPage = 1;
                 this.ViewBag.PageNumber = 1;
-                this.ViewBag.ClientsCount = 0;
+                this.ViewBag.RowsCount = 0;
 
                 return View("Index", GlobalClients);
             }
 
-            GlobalClients = _clientRepository.GetClientsByFilters(filterClient, 1, RowsPerPage).ToList();
+            GlobalClients = _clientRepository.SearchClients(filterClient, 1, RowsPerPage);
 
             SetSearchFiltersInSession(filterClient);
 
@@ -136,19 +142,11 @@ namespace CarRental_UI.Controllers
 
             this.ViewBag.MaxPage = (clientsCount / RowsPerPage) - (clientsCount % RowsPerPage == 0 ? 1 : 0) + 1;
             this.ViewBag.PageNumber = 1;
-            this.ViewBag.ClientsCount = clientsCount;
+            this.ViewBag.RowsCount = clientsCount;
             this.ViewBag.FilterOn = true;
             this.ViewData["FilterClient"] = filterClient;
 
             return View("Index", GlobalClients);
-        }
-
-        private bool ArePropertiesNull(object myObject)
-        {
-            return !myObject.GetType()
-                             .GetProperties()
-                             .Select(pi => pi.GetValue(myObject))
-                             .Any(value => value != null);
         }
 
         /// <summary>
@@ -185,7 +183,7 @@ namespace CarRental_UI.Controllers
         }
 
         /// <summary>
-        /// Calls GetClientById service which returns a client based on ID and then returns a view for editing customer
+        /// Calls GetClientById service which returns a client based on ID and then returns a view for editing clients
         /// </summary>
         /// <param name="id">ID of the client</param>
         /// <returns>Edit View</returns>
@@ -233,7 +231,6 @@ namespace CarRental_UI.Controllers
                     _clientRepository.UpdateClient(client);
 
                     return RedirectToAction("Details", new { id = id});
-                    //return Redirect($"Client/Details/{id}");
                 }
 
                 return View(client);
@@ -247,7 +244,7 @@ namespace CarRental_UI.Controllers
         /// <summary>
         /// Gets the client for deletion by ID and then opens page for deleting client
         /// </summary>
-        /// <param name="id">ID of the clinet for deletion</param>
+        /// <param name="id">ID of the client for deletion</param>
         /// <returns>Delete Vliew</returns>
         public IActionResult Delete(int? id)
         {
@@ -311,7 +308,9 @@ namespace CarRental_UI.Controllers
             FilterClient.Firstname = session.GetString("filter_Firstname");
             FilterClient.Lastname = session.GetString("filter_Lastname");
             FilterClient.Gender = session.GetString("filter_Gender");
+#pragma warning disable CS8604 // Possible null reference argument. It can't be a null reference because of the condition.
             FilterClient.Birthdate = String.IsNullOrEmpty(session.GetString("filter_Birthdate")) ? null : DateTime.Parse(session.GetString("filter_Birthdate"));
+#pragma warning restore CS8604 // Possible null reference argument.
             FilterClient.DriverLicenceNumber = session.GetString("filter_DriverLicenceNumber");
 
             return FilterClient;

@@ -10,9 +10,10 @@ namespace CarRental_Application.Repositories
 {
     public interface IClientRepository
     {
-        IEnumerable<ClientDTO> GetAllClients(int pageNumber, int rowsPerPage);
+        IEnumerable<ClientDTO> GetAllClients();
+        IEnumerable<ClientDTO> GetClientsForPagination(int pageNumber, int rowsPerPage);
         ClientDTO GetClientById(int id);
-        IEnumerable<ClientDTO> GetClientsByFilters(ClientDTO client, int pageNumber, int rowsPerPage);
+        IEnumerable<ClientDTO> SearchClients(ClientDTO client, int pageNumber, int rowsPerPage);
         int CreateClient(ClientDTO client);
         void UpdateClient(ClientDTO client);
         int DeleteClient(int id);

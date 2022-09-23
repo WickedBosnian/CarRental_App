@@ -1,96 +1,84 @@
-﻿@model IEnumerable<CarRental_DTO.ClientDTO>
+﻿@using CarRental_DTO;
+@model IEnumerable<VehicleDTO>
 
 @{
-    ViewData["Title"] = "Clients";
-    CarRental_DTO.ClientDTO? FilterClient = (CarRental_DTO.ClientDTO?)ViewData["FilterClient"];
+    ViewData["Title"] = "Vehicles";
+    VehicleDTO? FilterVehicle = (VehicleDTO?)ViewData["FilterVehicle"];
+    <p>
+        <a asp-action="Create" class="btn btn-outline-primary">Create New</a>
+    </p>
 }
-<p>
-    <a asp-action="Create" class="btn btn-outline-primary">Create New</a>
-</p>
 
-@*Form for searching Clients*@
-<form asp-controller="Client" asp-action="SearchClients" method="get">
-        <div class="input-group">
+@*Form for searching Vehicles*@
+<form asp-controller="Vehicle" asp-action="SearchVehicles" method="get">
+    <div class="input-group">
 
-            <input id="firstname" name="Firstname" value="@FilterClient?.Firstname" type="text" class="form-control rounded" style="margin:5px;" placeholder="Firstname" aria-label="Search" aria-describedby="search-addon" />
-            <input id="lastname" name="Lastname" value="@FilterClient?.Lastname" type="text" class="form-control rounded" style="margin:5px;" placeholder="Lastname" aria-label="Search" aria-describedby="search-addon" />
-            <input id="birthdate" name="Birthdate" value="@FilterClient?.Birthdate?.ToString("yyyy-MM-dd")" type="date" class="form-control rounded" style="margin:5px;" placeholder="Birthdate" aria-label="Birthdate" aria-describedby="search-addon" />
+        <input id="vehicleName" name="VehicleName" value="@FilterVehicle?.VehicleName" type="text" class="form-control rounded" style="margin:5px;" placeholder="VehicleName" aria-label="Search" aria-describedby="search-addon" />
+        <input id="vehicleManufacturerId" name="VehicleManufacturerId" value="@FilterVehicle?.VehicleManufacturerId" type="text" class="form-control rounded" style="margin:5px;" placeholder="Vehicle Manufacturer" aria-label="Search" aria-describedby="search-addon" />
+        <input id="vehicleTypeId" name="VehicleTypeId" value="@FilterVehicle?.VehicleTypeId" type="date" class="form-control rounded" style="margin:5px;" placeholder="Vehicle Type" aria-label="Birthdate" aria-describedby="search-addon" />
 
-            <select id="gender" name="Gender" class="form-select form-control rounded" style="margin:5px;">
-                <option selected value="">Gender</option>
-                @if (FilterClient?.Gender == "M")
-                {
-                    <option selected value="M">Male</option>
-                }else
-                {
-                    <option value="M">Male</option>
-                }
-                @if (FilterClient?.Gender == "F")
-                {
-                    <option selected value="F">Female</option>
-                }else
-                {
-                    <option value="F">Female</option>
-                }
-            </select>
-
-            <input id="driverLicenceNumber" name="DriverLicenceNumber" value="@FilterClient?.DriverLicenceNumber" type="text" class="form-control rounded" style="margin:5px;" placeholder="Driver Licence Number" aria-label="Search" aria-describedby="search-addon" />
-
-            <button type="submit" class="btn btn-outline-primary" value="firstname">Search</button>
-        </div>
+        <button type="submit" class="btn btn-outline-primary">Search</button>
+    </div>
 </form>
 <table class="table align-middle mb-0 bg-white table-hover">
     <thead class="bg-light">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Firstname)
+                @Html.DisplayNameFor(model => model.VehicleName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Lastname)
+                @Html.DisplayNameFor(model => model.VehicleManufacturer.VehicleManufacturerName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Birthdate)
+                @Html.DisplayNameFor(model => model.VehicleType.VehicleTypeName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Gender)
+                @Html.DisplayNameFor(model => model.DateManufactured)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DriverLicenceNumber)
+                @Html.DisplayNameFor(model => model.PricePerDay)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PersonalIdcardNumber)
+                @Html.DisplayNameFor(model => model.Color)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Firstname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Lastname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Birthdate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Gender)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DriverLicenceNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PersonalIdcardNumber)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ClientId" class="btn btn-outline-warning">Edit</a>
-                <a asp-action="Details" asp-route-id="@item.ClientId" class="btn btn-outline-info">Details</a>
-                <a asp-action="Delete" asp-route-id="@item.ClientId" class="btn btn-outline-danger">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.VehicleName)
+                </td>
+                <td>
+                    @if (item.VehicleManufacturer != null)
+                    {
+                        @Html.DisplayFor(modelItem => item.VehicleManufacturer.VehicleManufacturerName)
+                    }
+                </td>
+                <td>
+                    @if (item.VehicleType != null)
+                    {
+                        @Html.DisplayFor(modelItem => item.VehicleType.VehicleTypeName)
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateManufactured)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PricePerDay)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Color)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.VehicleId" class="btn btn-outline-warning">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.VehicleId" class="btn btn-outline-info">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.VehicleId" class="btn btn-outline-danger">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 
@@ -105,7 +93,9 @@
         @if (ViewBag.PageNumber > 1)
         {
             <li class="page-item"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = ViewBag.PageNumber - 1, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })" tabindex="-1">Previous</a></li>
-        }else{
+        }
+        else
+        {
             <li class="page-item disabled"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = ViewBag.PageNumber - 1, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })" tabindex="-1">Previous</a></li>
         }
 
@@ -133,11 +123,12 @@
                 if (ViewBag.PageNumber == counter)
                 {
                     <li class="page-item active"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = @counter, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">@counter</a></li>
-                }else
+                }
+                else
                 {
                     <li class="page-item"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = @counter, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">@counter</a></li>
                 }
-                
+
                 counter++;
             }
 
@@ -152,7 +143,9 @@
         @if (ViewBag.PageNumber < ViewBag.MaxPage)
         {
             <li class="page-item"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = ViewBag.PageNumber + 1, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">Next</a></li>
-        }else{
+        }
+        else
+        {
             <li class="page-item disabled"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = ViewBag.PageNumber + 1, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">Next</a></li>
         }
     </ul>

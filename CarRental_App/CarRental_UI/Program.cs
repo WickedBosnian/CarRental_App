@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using CarRental_Application.Repositories;
 using CarRental_Infrastructure.Helpers;
 using CarRental_Infrastructure.Repositories;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,12 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+var cultureInfo = new CultureInfo(CultureInfo.InvariantCulture.Name);
+cultureInfo.NumberFormat.CurrencySymbol = "€";
+
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
 var app = builder.Build();
 

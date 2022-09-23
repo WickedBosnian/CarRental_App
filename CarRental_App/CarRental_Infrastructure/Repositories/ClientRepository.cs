@@ -144,9 +144,24 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<ClientDTO> GetAllClients(int pageNumber = 1, int rowsPerPage = 10)
+        public IEnumerable<ClientDTO> GetAllClients()
         {
             string sqlCommand = "EXEC dbo.GetAllClients @PageNumber, @RowsPerPage";
+
+            try
+            {
+                IEnumerable<Client> clients = _context.Clients.FromSqlRaw(sqlCommand).AsEnumerable();
+                return clients.Select(x => Mapper.ToClientDTO(x));
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception(sqlEx.Message + ";" + sqlEx.InnerException?.Message);
+            }
+        }
+
+        public IEnumerable<ClientDTO> GetClientsForPagination(int pageNumber = 1, int rowsPerPage = 10)
+        {
+            string sqlCommand = "EXEC dbo.GetClientsForPagination @PageNumber, @RowsPerPage";
 
             try
             {
@@ -190,7 +205,7 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<ClientDTO> GetClientsByFilters(ClientDTO client, int pageNumber = 1, int rowsPerPage = 10)
+        public IEnumerable<ClientDTO> SearchClients(ClientDTO client, int pageNumber = 1, int rowsPerPage = 10)
         {
             string sqlCommand = "EXEC dbo.GetClientsByFilters @Firstname, @Lastname, @DriverLicenceNumber, @PersonalIDCardNumber, @Birthdate, @Gender, @PageNumber, @RowsPerPage";
 

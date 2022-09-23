@@ -123,9 +123,9 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<VehicleDTO> SearchVehicles(VehicleDTO vehicle)
+        public IEnumerable<VehicleDTO> SearchVehicles(VehicleDTO vehicle, int pageNumber = 1, int rowsPerPage = 10)
         {
-            string sqlCommand = "EXEC dbo.SearchVehicles @VehicleName, @VehicleManufacturerId, @VehicleTypeId";
+            string sqlCommand = "EXEC dbo.SearchVehicles @VehicleName, @VehicleManufacturerId, @VehicleTypeId, @PageNumber, @RowsPerPage";
 
             try
             {
@@ -133,7 +133,9 @@ namespace CarRental_Infrastructure.Repositories
                 {
                     new SqlParameter { ParameterName = "@VehicleName", Value = String.IsNullOrEmpty(vehicle.VehicleName) ? DBNull.Value : vehicle.VehicleName},
                     new SqlParameter { ParameterName = "@VehicleManufacturerId", Value = vehicle.VehicleManufacturerId == null ? DBNull.Value : vehicle.VehicleManufacturerId},
-                    new SqlParameter { ParameterName = "@VehicleTypeId", Value = vehicle.VehicleTypeId == null ? DBNull.Value : vehicle.VehicleTypeId}
+                    new SqlParameter { ParameterName = "@VehicleTypeId", Value = vehicle.VehicleTypeId == null ? DBNull.Value : vehicle.VehicleTypeId},
+                    new SqlParameter { ParameterName = "@PageNumber", Value = pageNumber},
+                    new SqlParameter { ParameterName = "@RowsPerPage", Value = rowsPerPage}
                 };
 
                 IEnumerable<Vehicle> vehicles = _context.Vehicles.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable();
@@ -157,7 +159,7 @@ namespace CarRental_Infrastructure.Repositories
                     new SqlParameter { ParameterName = "@VehicleName", Value = String.IsNullOrEmpty(vehicle.VehicleName) ? DBNull.Value : vehicle.VehicleName},
                     new SqlParameter { ParameterName = "@VehicleManufacturerId", Value = vehicle.VehicleManufacturerId == null ? DBNull.Value : vehicle.VehicleManufacturerId},
                     new SqlParameter { ParameterName = "@VehicleTypeId", Value = vehicle.VehicleTypeId == null ? DBNull.Value : vehicle.VehicleTypeId},
-                    new SqlParameter { ParameterName = "@Color", Value = String.IsNullOrEmpty(vehicle.Color) ? DBNull.Value : vehicle.Color},
+                    new SqlParameter { ParameterName = "@Color", Value = String.IsNullOrEmpty(vehicle.Color) ? "" : vehicle.Color},
                     new SqlParameter { ParameterName = "@DateManufactured", Value = vehicle.DateManufactured == null ? DBNull.Value : vehicle.DateManufactured},
                     new SqlParameter { ParameterName = "@PricePerDay", Value = vehicle.PricePerDay == null ? DBNull.Value : vehicle.PricePerDay}
                 };
@@ -171,6 +173,84 @@ namespace CarRental_Infrastructure.Repositories
                 cmd.ExecuteNonQuery();
 
                 cmd.Connection.Close();
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception(sqlEx.Message + ";" + sqlEx.InnerException?.Message);
+            }
+        }
+
+        /// <summary>
+        /// This method calls a function from DB that returns count of records from table Client
+        /// </summary>
+        public int CountOfVehicles()
+        {
+            int countOfVehicles = -1;
+            string sqlCommand = "SELECT dbo.CountOfVehicles()";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(sqlCommand, new SqlConnection(_context.Database.GetConnectionString()));
+
+                cmd.Connection.Open();
+
+                countOfVehicles = (int)cmd.ExecuteScalar();
+
+                cmd.Connection.Close();
+
+                return countOfVehicles;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception(sqlEx.Message + ";" + sqlEx.InnerException?.Message);
+            }
+        }
+
+        public int CountOfVehiclesWithFilters(VehicleDTO filterVehicle)
+        {
+            string sqlCommand = "SELECT dbo.CountOfVehiclesWithFilters(@VehicleName, @VehicleManufacturerId, @VehicleTypeId)";
+            int countOfVehicles = -1;
+            try
+            {
+                List<SqlParameter> sqlParams = new List<SqlParameter>
+                {
+                    new SqlParameter { ParameterName = "@VehicleName", Value = String.IsNullOrEmpty(filterVehicle.VehicleName) ? DBNull.Value : filterVehicle.VehicleName},
+                    new SqlParameter { ParameterName = "@VehicleManufacturerId", Value = filterVehicle.VehicleManufacturerId == null ? DBNull.Value : filterVehicle.VehicleManufacturerId},
+                    new SqlParameter { ParameterName = "@VehicleTypeId", Value = filterVehicle.VehicleTypeId == null ? DBNull.Value : filterVehicle.VehicleTypeId}
+                };
+
+                SqlCommand cmd = new SqlCommand(sqlCommand, new SqlConnection(_context.Database.GetConnectionString()));
+
+                cmd.Parameters.AddRange(sqlParams.ToArray());
+                cmd.Connection.Open();
+
+                countOfVehicles = (int)cmd.ExecuteScalar();
+
+                cmd.Connection.Close();
+
+                return countOfVehicles;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception(sqlEx.Message + ";" + sqlEx.InnerException?.Message);
+            }
+        }
+
+        public IEnumerable<VehicleDTO> GetVehiclesForPagination(int pageNumber, int rowsPerPage)
+        {
+            string sqlCommand = "EXEC dbo.GetVehiclesForPagination @PageNumber, @RowsPerPage";
+
+            try
+            {
+                List<SqlParameter> sqlParams = new List<SqlParameter>
+                {
+                    new SqlParameter { ParameterName = "@PageNumber", Value = pageNumber },
+                    new SqlParameter { ParameterName = "@RowsPerPage", Value = rowsPerPage }
+                };
+
+                IEnumerable<Vehicle> vehicles = _context.Vehicles.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable();
+
+                return vehicles.Select(x => Mapper.ToVehicleDTO(x));
             }
             catch (SqlException sqlEx)
             {

@@ -1,0 +1,61 @@
+﻿@using CarRental_DTO;
+@model VehicleDTO
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Vehicle Details</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.VehicleName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.VehicleName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.VehicleManufacturer)
+        </dt>
+        <dd class="col-sm-10">
+            @*The line bellow is commented to show that it throws a false positive warning because a condition shows that VehicleType object is not null in Vehicle object. 
+            Same false positive warning is shown for VehicleType*@
+            @* @if(Model.VehicleType is not null)
+                @Html.DisplayFor(model => model.VehicleType.VehicleTypeName)*@
+            <span>@Model.VehicleManufacturer?.VehicleManufacturerName</span>
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.VehicleType)
+        </dt>
+        <dd class="col-sm-10">
+            <span>@Model.VehicleType?.VehicleTypeName</span>
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DateManufactured)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DateManufactured)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PricePerDay)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PricePerDay) KM
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Color)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Color)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" style="margin:5px 0px 5px 0px;" class="btn btn-outline-warning" asp-route-id="@Model?.VehicleId">Edit</a>
+</div>
+
+<div>
+    <a class="btn btn-outline-dark" asp-action="Index">Back to List</a>
+</div>

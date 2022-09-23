@@ -1,0 +1,83 @@
+﻿@using CarRental_DTO;
+@model VehicleDTO
+
+@{
+    ViewData["Title"] = "Edit";
+    IEnumerable<VehicleManufacturerDTO>? vehicleManufacturers = (IEnumerable<VehicleManufacturerDTO>?)ViewData["VehicleManufacturers"];
+    IEnumerable<VehicleTypeDTO>? vehicleTypes = (IEnumerable<VehicleTypeDTO>?)ViewData["VehicleTypes"];
+}
+
+<h1>Edit Vehicle</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="VehicleId" />
+            <div class="form-group">
+                <label asp-for="VehicleName" class="control-label"></label>
+                <input asp-for="VehicleName" class="form-control" />
+                <span asp-validation-for="VehicleName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="VehicleManufacturerId" class="control-label"></label>
+                <select asp-for="VehicleManufacturerId" class="form-control">
+                    @foreach(VehicleManufacturerDTO vehicleManufacturer in vehicleManufacturers ?? new List<VehicleManufacturerDTO>()){
+                        if (vehicleManufacturer.VehicleManufacturerId == Model.VehicleManufacturerId)
+                        {
+                            <option selected value="@vehicleManufacturer.VehicleManufacturerId">@vehicleManufacturer.VehicleManufacturerName</option>
+                        }else{
+                            <option value="@vehicleManufacturer.VehicleManufacturerId">@vehicleManufacturer.VehicleManufacturerName</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="VehicleManufacturerId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="VehicleTypeId" class="control-label"></label>
+                <select asp-for="VehicleTypeId" class="form-control">
+                    @foreach (VehicleTypeDTO vehicleType in vehicleTypes ?? new List<VehicleTypeDTO>())
+                    {
+                        if (vehicleType.VehicleTypeId == Model.VehicleTypeId)
+                        {
+                            <option selected value="@vehicleType.VehicleTypeId">@vehicleType.VehicleTypeName</option>
+                        }
+                        else
+                        {
+                            <option value="@vehicleType.VehicleTypeId">@vehicleType.VehicleTypeName</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="VehicleTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateManufactured" class="control-label"></label>
+                <input asp-for="DateManufactured" class="form-control" />
+                <span asp-validation-for="DateManufactured" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PricePerDay" class="control-label"></label>
+                <input asp-for="PricePerDay" class="form-control" />
+                <span asp-validation-for="PricePerDay" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Color" class="control-label"></label>
+                <input asp-for="Color" class="form-control" />
+                <span asp-validation-for="Color" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" style="margin:5px 0px 5px 0px;" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a class="btn btn-outline-dark" asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

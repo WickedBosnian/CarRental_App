@@ -50,6 +50,10 @@ namespace CarRental_UI.Controllers
         {
             try
             {
+                //Gets vehicle types and manufacturers for filters
+                ViewData["VehicleTypes"] = _vehicleTypeRepository.GetAllVehicleTypes();
+                ViewData["VehicleManufacturers"] = _vehicleManufacturerRepository.GetAllVehicleManufacturers();
+
                 //Checks if count of rows should be updated from DB
                 if (rowsCount == 0)
                 {
@@ -117,13 +121,11 @@ namespace CarRental_UI.Controllers
                 if (vehicle.VehicleTypeId != null)
                 {
                     vehicle.VehicleType = _vehicleTypeRepository.GetVehicleTypeById((int)vehicle.VehicleTypeId);
-                    ViewData["VehicleType"] = vehicle.VehicleType;
                 }
 
                 if (vehicle.VehicleManufacturerId != null)
                 {
                     vehicle.VehicleManufacturer = _vehicleManufacturerRepository.GetVehicleManufacturerById((int)vehicle.VehicleManufacturerId);
-                    ViewData["VehicleManufacturer"] = vehicle.VehicleManufacturer;
                 }
 
                 return View(vehicle);
@@ -141,30 +143,38 @@ namespace CarRental_UI.Controllers
         /// <returns>If the filter values in VehicleDTO object are all null then it returns empty index page, otherwise it returns records from Vehicle table based on filter values</returns>
         public IActionResult SearchVehicles(VehicleDTO filterVehicle)
         {
-            if (CommonFunctions.ArePropertiesNull(filterVehicle))
+            try
             {
-                this.ViewBag.MaxPage = 1;
+                ViewData["VehicleTypes"] = _vehicleTypeRepository.GetAllVehicleTypes();
+                ViewData["VehicleManufacturers"] = _vehicleManufacturerRepository.GetAllVehicleManufacturers();
+
+                if (CommonFunctions.ArePropertiesNull(filterVehicle))
+                {
+                    this.ViewBag.MaxPage = 1;
+                    this.ViewBag.PageNumber = 1;
+                    this.ViewBag.RowsCount = 0;
+
+                    return View("Index", GlobalVehicles);
+                }
+
+                GlobalVehicles = _vehicleRepository.SearchVehicles(filterVehicle, 1, RowsPerPage);
+
+                SetSearchFiltersInSession(filterVehicle);
+
+                int rowsCount = CountOfVehiclesWithFilters(filterVehicle);
+
+                this.ViewBag.MaxPage = (rowsCount / RowsPerPage) - (rowsCount % RowsPerPage == 0 ? 1 : 0) + 1;
                 this.ViewBag.PageNumber = 1;
-                this.ViewBag.RowsCount = 0;
+                this.ViewBag.RowsCount = rowsCount;
+                this.ViewBag.FilterOn = true;
+                this.ViewData["FilterVehicle"] = filterVehicle;
 
                 return View("Index", GlobalVehicles);
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message + " ; " + ex.InnerException?.Message);
             }
-
-            GlobalVehicles = _vehicleRepository.SearchVehicles(filterVehicle, 1, RowsPerPage);
-
-            SetSearchFiltersInSession(filterVehicle);
-
-            int rowsCount = CountOfVehiclesWithFilters(filterVehicle);
-
-            this.ViewBag.MaxPage = (rowsCount / RowsPerPage) - (rowsCount % RowsPerPage == 0 ? 1 : 0) + 1;
-            this.ViewBag.PageNumber = 1;
-            this.ViewBag.RowsCount = rowsCount;
-            this.ViewBag.FilterOn = true;
-            this.ViewData["FilterVehicle"] = filterVehicle;
-
-            return View("Index", GlobalVehicles);
         }
-
 
         public IActionResult Create()
         {
@@ -259,7 +269,7 @@ namespace CarRental_UI.Controllers
         {
             try
             {
-                if (id != vehicle.VehicleId)
+                if (id != vehicle.VehicleId || id == null)
                 {
                     return NotFound();
                 }
@@ -300,6 +310,18 @@ namespace CarRental_UI.Controllers
                     return NotFound();
                 }
 
+                if (vehicle.VehicleTypeId != null)
+                {
+                    vehicle.VehicleType = _vehicleTypeRepository.GetVehicleTypeById((int)vehicle.VehicleTypeId);
+                    ViewData["VehicleType"] = vehicle.VehicleType;
+                }
+
+                if (vehicle.VehicleManufacturerId != null)
+                {
+                    vehicle.VehicleManufacturer = _vehicleManufacturerRepository.GetVehicleManufacturerById((int)vehicle.VehicleManufacturerId);
+                    ViewData["VehicleManufacturer"] = vehicle.VehicleManufacturer;
+                }
+
                 return View(vehicle);
             }
             catch (Exception ex)
@@ -313,7 +335,7 @@ namespace CarRental_UI.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int? id)
         {
@@ -356,9 +378,6 @@ namespace CarRental_UI.Controllers
             session.SetString("filter_VehicleName", String.IsNullOrEmpty(filterVehicle.VehicleName) ? "" : filterVehicle.VehicleName);
 #pragma warning disable CS8604 // Possible null reference argument. It can't be null, it will either be a valid value or an empty string.
             session.SetString("filter_VehicleManufacturerId", Convert.ToString(filterVehicle.VehicleManufacturerId));
-#pragma warning restore CS8604 // Possible null reference argument.
-
-#pragma warning disable CS8604 // Possible null reference argument. It can't be null, it will either be a valid value or an empty string.
             session.SetString("filter_filterVehicleTypeId", Convert.ToString(filterVehicle.VehicleTypeId));
 #pragma warning restore CS8604 // Possible null reference argument.
         }

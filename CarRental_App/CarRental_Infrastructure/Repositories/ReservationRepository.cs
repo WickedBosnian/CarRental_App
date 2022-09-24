@@ -101,6 +101,27 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
+        public IEnumerable<ReservationDTO> GetReservationsForPagination(int pageNumber = 1, int rowsPerPage = 10)
+        {
+            string sqlCommand = "EXEC dbo.GetReservationsForPagination @PageNumber, @RowsPerPage";
+
+            try
+            {
+                List<SqlParameter> sqlParams = new List<SqlParameter>
+                {
+                    new SqlParameter { ParameterName = "@PageNumber", Value = pageNumber },
+                    new SqlParameter { ParameterName = "@RowsPerPage", Value = rowsPerPage }
+                };
+
+                IEnumerable<Reservation> reservations = _context.Reservations.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable();
+                return reservations.Select(x => Mapper.ToReservationDTO(x));
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception(sqlEx.Message + ";" + sqlEx.InnerException?.Message);
+            }
+        }
+
         public ReservationDTO GetReservationById(int id)
         {
             string sqlCommand = $"EXEC dbo.GetReservationById @ReservationId";
@@ -126,9 +147,9 @@ namespace CarRental_Infrastructure.Repositories
             }
         }
 
-        public IEnumerable<ReservationDTO> SearchReservations(ReservationDTO reservation)
+        public IEnumerable<ReservationDTO> SearchReservations(ReservationDTO reservation, int pageNumber = 1, int rowsPerPage = 10)
         {
-            string sqlCommand = "EXEC dbo.SearchReservations @DateFrom, @DateTo, @ClientId, @VehicleId, @Active";
+            string sqlCommand = "EXEC dbo.SearchReservations @DateFrom, @DateTo, @ClientId, @VehicleId, @Active, @PageNumber, @RowsPerPage";
 
             try
             {
@@ -138,11 +159,68 @@ namespace CarRental_Infrastructure.Repositories
                     new SqlParameter { ParameterName = "@DateTo", Value = reservation.ReservationDateTo == null ? DBNull.Value : reservation.ReservationDateTo},
                     new SqlParameter { ParameterName = "@ClientId", Value = reservation.ClientId == null ? DBNull.Value : reservation.ClientId},
                     new SqlParameter { ParameterName = "@VehicleId", Value = reservation.VehicleID == null ? DBNull.Value : reservation.VehicleID},
-                    new SqlParameter { ParameterName = "@Active", Value = reservation.Active == null ? DBNull.Value : reservation.Active}
+                    new SqlParameter { ParameterName = "@Active", Value = reservation.Active == null ? DBNull.Value : reservation.Active},
+                    new SqlParameter { ParameterName = "@PageNumber", Value = pageNumber},
+                    new SqlParameter { ParameterName = "@RowsPerPage", Value = rowsPerPage}
                 };
 
                 IEnumerable<Reservation> reservations = _context.Reservations.FromSqlRaw(sqlCommand, sqlParams.ToArray()).AsEnumerable();
                 return reservations.Select(x => Mapper.ToReservationDTO(x));
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception(sqlEx.Message + ";" + sqlEx.InnerException?.Message);
+            }
+        }
+
+        public int CountOfReservations()
+        {
+            int countOfReservations = -1;
+            string sqlCommand = "SELECT dbo.CountOfReservations()";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(sqlCommand, new SqlConnection(_context.Database.GetConnectionString()));
+
+                cmd.Connection.Open();
+
+                countOfReservations = (int)cmd.ExecuteScalar();
+
+                cmd.Connection.Close();
+
+                return countOfReservations;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception(sqlEx.Message + ";" + sqlEx.InnerException?.Message);
+            }
+        }
+
+        public int CountOfReservationsWithFilters(ReservationDTO filterReservation)
+        {
+            string sqlCommand = "SELECT dbo.CountOfReservationsWithFilters(@DateFrom, @DateTo, @ClientId, @VehicleId, @Active)";
+            int countOfReservations = -1;
+            try
+            {
+                List<SqlParameter> sqlParams = new List<SqlParameter>
+                {
+                    new SqlParameter { ParameterName = "@DateFrom", Value = filterReservation.ReservationDateFrom == null ? DBNull.Value : filterReservation.ReservationDateFrom},
+                    new SqlParameter { ParameterName = "@DateTo", Value = filterReservation.ReservationDateTo == null ? DBNull.Value : filterReservation.ReservationDateTo},
+                    new SqlParameter { ParameterName = "@ClientId", Value = filterReservation.ClientId == null ? DBNull.Value : filterReservation.ClientId},
+                    new SqlParameter { ParameterName = "@VehicleId", Value = filterReservation.VehicleID == null ? DBNull.Value : filterReservation.VehicleID},
+                    new SqlParameter { ParameterName = "@Active", Value = filterReservation.Active == null ? DBNull.Value : filterReservation.Active},
+                };
+
+                SqlCommand cmd = new SqlCommand(sqlCommand, new SqlConnection(_context.Database.GetConnectionString()));
+
+                cmd.Parameters.AddRange(sqlParams.ToArray());
+                cmd.Connection.Open();
+
+                countOfReservations = (int)cmd.ExecuteScalar();
+
+                cmd.Connection.Close();
+
+                return countOfReservations;
             }
             catch (SqlException sqlEx)
             {

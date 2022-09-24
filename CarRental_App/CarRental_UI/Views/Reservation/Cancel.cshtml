@@ -1,0 +1,48 @@
+﻿@using CarRental_DTO;
+@model ReservationDTO
+
+@{
+    ViewData["Title"] = "Cancel";
+}
+
+<h1>Cancel Reservation</h1>
+
+<h3>Are you sure you want to cancel this reservation?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ReservationDateFrom)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ReservationDateFrom)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ReservationDateTo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ReservationDateTo)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Vehicle)
+        </dt>
+        <dd class="col-sm-10">
+            <span>@Model.Vehicle?.VehicleName</span>
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Client)
+        </dt>
+        <dd class="col-sm-10">
+            <span>@Model.Client?.Firstname @Model.Client?.Lastname - @Model.Client?.DriverLicenceNumber</span>
+        </dd>
+    </dl>
+
+    <form asp-action="Cancel">
+        <input type="hidden" asp-for="ReservationId" />
+        <input type="submit" style="margin:5px 0px 5px 0px;" value="Delete" class="btn btn-danger" />
+    </form>
+</div>
+
+<div>
+    <a class="btn btn-outline-dark" asp-action="Index">Back to List</a>
+</div>

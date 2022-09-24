@@ -146,7 +146,7 @@ namespace CarRental_Infrastructure.Repositories
 
         public IEnumerable<ClientDTO> GetAllClients()
         {
-            string sqlCommand = "EXEC dbo.GetAllClients @PageNumber, @RowsPerPage";
+            string sqlCommand = "EXEC dbo.GetAllClients";
 
             try
             {

@@ -18,16 +18,20 @@
             @Html.DisplayFor(model => model.VehicleName)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.VehicleManufacturer != null ? model.VehicleManufacturer.VehicleManufacturerName : "")
+            @Html.DisplayNameFor(model => model.VehicleManufacturer)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.VehicleManufacturer != null ? model.VehicleManufacturer.VehicleManufacturerName : "")
+            @*The line bellow is commented to show that it throws a false positive warning because a condition shows that VehicleType object is not null in Vehicle object.
+            Same false positive warning is shown for VehicleType*@
+            @* @if(Model.VehicleType is not null)
+            @Html.DisplayFor(model => model.VehicleType.VehicleTypeName)*@
+            <span>@Model.VehicleManufacturer?.VehicleManufacturerName</span>
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.VehicleType != null ? model.VehicleType.VehicleTypeName : "")
+            @Html.DisplayNameFor(model => model.VehicleType)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.VehicleType != null ? model.VehicleType.VehicleTypeName : "")
+            <span>@Model.VehicleType?.VehicleTypeName</span>
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.DateManufactured)

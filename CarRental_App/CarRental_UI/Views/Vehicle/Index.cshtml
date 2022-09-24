@@ -4,6 +4,8 @@
 @{
     ViewData["Title"] = "Vehicles";
     VehicleDTO? FilterVehicle = (VehicleDTO?)ViewData["FilterVehicle"];
+    IEnumerable<VehicleManufacturerDTO>? vehicleManufacturers = (IEnumerable<VehicleManufacturerDTO>?)ViewData["VehicleManufacturers"];
+    IEnumerable<VehicleTypeDTO>? vehicleTypes = (IEnumerable<VehicleTypeDTO>?)ViewData["VehicleTypes"];
     <p>
         <a asp-action="Create" class="btn btn-outline-primary">Create New</a>
     </p>
@@ -14,8 +16,33 @@
     <div class="input-group">
 
         <input id="vehicleName" name="VehicleName" value="@FilterVehicle?.VehicleName" type="text" class="form-control rounded" style="margin:5px;" placeholder="VehicleName" aria-label="Search" aria-describedby="search-addon" />
-        <input id="vehicleManufacturerId" name="VehicleManufacturerId" value="@FilterVehicle?.VehicleManufacturerId" type="text" class="form-control rounded" style="margin:5px;" placeholder="Vehicle Manufacturer" aria-label="Search" aria-describedby="search-addon" />
-        <input id="vehicleTypeId" name="VehicleTypeId" value="@FilterVehicle?.VehicleTypeId" type="date" class="form-control rounded" style="margin:5px;" placeholder="Vehicle Type" aria-label="Birthdate" aria-describedby="search-addon" />
+
+        <select id="vehicleManufacturerId" name="VehicleManufacturerId" class="form-control form-control rounded" style="margin:5px;">
+            <option selected value="">Vehicle Manufacturers...</option>
+                @foreach (VehicleManufacturerDTO vehicleManufacturer in vehicleManufacturers ?? new List<VehicleManufacturerDTO>())
+                {
+                    if (FilterVehicle?.VehicleManufacturerId == vehicleManufacturer.VehicleManufacturerId)
+                    {
+                        <option selected value="@vehicleManufacturer.VehicleManufacturerId">@vehicleManufacturer.VehicleManufacturerName</option>
+                    }else{
+                        <option value="@vehicleManufacturer.VehicleManufacturerId">@vehicleManufacturer.VehicleManufacturerName</option>
+                    }
+                }
+            </select>
+
+        <select id="vehicleTypeId" name="VehicleTypeId" class="form-control form-control rounded" style="margin:5px;">
+            <option selected value="">Vehicle Types...</option>
+                @foreach (VehicleTypeDTO vehicleType in vehicleTypes ?? new List<VehicleTypeDTO>())
+                {
+                    if (FilterVehicle?.VehicleTypeId == vehicleType.VehicleTypeId)
+                    {
+                        <option selected value="@vehicleType.VehicleTypeId">@vehicleType.VehicleTypeName</option>
+                    }else
+                    {
+                        <option value="@vehicleType.VehicleTypeId">@vehicleType.VehicleTypeName</option>
+                    }
+                }
+            </select>
 
         <button type="submit" class="btn btn-outline-primary">Search</button>
     </div>
@@ -101,10 +128,10 @@
 
         @*This section creates page numbers for pagination between Next and Previous buttons as well as buttons ... that lead to the first or last page in pagination*@
         @{
-            @*counter is a variable that is used as a page number, it is always smaller than the current page unless the current page is 1*@
+                @*counter is a variable that is used as a page number, it is always smaller than the current page unless the current page is 1*@
             int counter = ViewBag.PageNumber > 1 ? ViewBag.PageNumber - 1 : ViewBag.PageNumber;
 
-            @*tempMaxPage holds a value of how much page numbers are displayed between Next and Previous buttons, it has a fixed value of 3 for esthetic purpose*@
+                @*tempMaxPage holds a value of how much page numbers are displayed between Next and Previous buttons, it has a fixed value of 3 for esthetic purpose*@
             int tempMaxPage = ViewBag.MaxPage < 3 ? ViewBag.MaxPage : 3;
 
             if (ViewBag.PageNumber == ViewBag.MaxPage && ViewBag.PageNumber > 2)
@@ -112,30 +139,30 @@
                 counter--;
             }
 
-            @*This part creates ... button that leads to the last page in pagination*@
+                @*This part creates ... button that leads to the last page in pagination*@
             if (counter > 1)
             {
-                <li class="page-item"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = 1, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">...</a></li>
+                    <li class="page-item"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = 1, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">...</a></li>
             }
 
             for (int i = 0; i < tempMaxPage; i++)
             {
                 if (ViewBag.PageNumber == counter)
                 {
-                    <li class="page-item active"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = @counter, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">@counter</a></li>
+                        <li class="page-item active"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = @counter, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">@counter</a></li>
                 }
                 else
                 {
-                    <li class="page-item"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = @counter, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">@counter</a></li>
+                        <li class="page-item"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = @counter, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">@counter</a></li>
                 }
 
                 counter++;
             }
 
-            @*This part creates ... button that leads to the first page in pagination*@
+                @*This part creates ... button that leads to the first page in pagination*@
             if (counter - 1 < ViewBag.MaxPage && ViewBag.MaxPage > 2)
             {
-                <li class="page-item"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = ViewBag.MaxPage, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">...</a></li>
+                    <li class="page-item"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = ViewBag.MaxPage, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">...</a></li>
             }
         }
 

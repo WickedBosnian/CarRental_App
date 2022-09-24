@@ -37,7 +37,7 @@ namespace CarRental_UI.Controllers
         }
 
         /// <summary>
-        /// Index action, calls GetAllClients service which retreives all clients based on pagination
+        /// Index action, calls GetClientsForPagination service which retreives all clients based on pge number and rows per page
         /// </summary>
         /// <param name="pageNumber">Value of current page on pagination</param>
         /// <param name="filterOn">If filterOn is true then SearchClients is called for getting clients otherwise GetClientsForPagination is called for getting clients</param>

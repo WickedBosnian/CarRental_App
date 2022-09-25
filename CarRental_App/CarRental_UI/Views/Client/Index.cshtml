@@ -95,65 +95,8 @@
 </table>
 
 @*Pagination*@
-<nav aria-label="Page navigation example" style="margin-top:10px;">
-    <ul class="pagination justify-content-center">
-        @*ActionName is used as a parameter that holds name of the Action that is called in current Controller*@
-        @{
-            string ActionName = "Index";
-        }
-        @*This part creates Previous button if the current page is not the first page on pagination*@
-        @if (ViewBag.PageNumber > 1)
-        {
-            <li class="page-item"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = ViewBag.PageNumber - 1, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })" tabindex="-1">Previous</a></li>
-        }else{
-            <li class="page-item disabled"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = ViewBag.PageNumber - 1, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })" tabindex="-1">Previous</a></li>
-        }
-
-        @*This section creates page numbers for pagination between Next and Previous buttons as well as buttons ... that lead to the first or last page in pagination*@
-        @{
-            @*counter is a variable that is used as a page number, it is always smaller than the current page unless the current page is 1*@
-            int counter = ViewBag.PageNumber > 1 ? ViewBag.PageNumber - 1 : ViewBag.PageNumber;
-
-            @*tempMaxPage holds a value of how much page numbers are displayed between Next and Previous buttons, it has a fixed value of 3 for esthetic purpose*@
-            int tempMaxPage = ViewBag.MaxPage < 3 ? ViewBag.MaxPage : 3;
-
-            if (ViewBag.PageNumber == ViewBag.MaxPage && ViewBag.PageNumber > 2)
-            {
-                counter--;
-            }
-
-            @*This part creates ... button that leads to the last page in pagination*@
-            if (counter > 1)
-            {
-                <li class="page-item"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = 1, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">...</a></li>
-            }
-
-            for (int i = 0; i < tempMaxPage; i++)
-            {
-                if (ViewBag.PageNumber == counter)
-                {
-                    <li class="page-item active"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = @counter, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">@counter</a></li>
-                }else
-                {
-                    <li class="page-item"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = @counter, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">@counter</a></li>
-                }
-                
-                counter++;
-            }
-
-            @*This part creates ... button that leads to the first page in pagination*@
-            if (counter - 1 < ViewBag.MaxPage && ViewBag.MaxPage > 2)
-            {
-                <li class="page-item"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = ViewBag.MaxPage, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">...</a></li>
-            }
-        }
-
-        @*This part creates Next button if the current page is not the last page on pagination*@
-        @if (ViewBag.PageNumber < ViewBag.MaxPage)
-        {
-            <li class="page-item"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = ViewBag.PageNumber + 1, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">Next</a></li>
-        }else{
-            <li class="page-item disabled"><a class="page-link" href="@Url.Action(ActionName, new { pageNumber = ViewBag.PageNumber + 1, rowsCount = ViewBag.RowsCount, filterOn = ViewBag.FilterOn })">Next</a></li>
-        }
-    </ul>
-</nav>
+<div>
+    @{
+        await Html.RenderPartialAsync("_Pagination", new ViewDataDictionary(this.ViewData) { { "ActionName", "Index" }, { "ControllerName", "Client" } });
+    }
+</div>

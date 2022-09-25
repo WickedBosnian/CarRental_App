@@ -58,17 +58,5 @@ It is recommended to use Microsoft SQL Server Management Studio 18.</br>
    ```sh
    git clone https://github.com/WickedBosnian/CarRental_App.git
    ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
    
-CarRental_DB_SchemaAndData.sql script creates the database along with test data.</br>
-CarRental_DB_Schema.sql script creates database without the data.</br>
-CarRental_DB_Data.sql script inserts test data into the database.</br>
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>

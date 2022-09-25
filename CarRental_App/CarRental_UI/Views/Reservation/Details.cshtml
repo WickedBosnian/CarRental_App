@@ -14,7 +14,7 @@
     {
     <h3><i class="material-icons" style="font-size:48px;color:darkgoldenrod; padding-bottom:-10px;">add_alert</i>This reservation is still active but the date has Expired!</h3>
     }
-    else if (Model.Active != null && Model.Active == true && Model.ReservationDateFrom >= DateTime.Now.Date)
+    else if (Model.Active != null && Model.Active == true && Model.ReservationDateFrom > DateTime.Now.Date)
     {
         <h3><i class="material-icons" style="font-size:48px;color:green; padding-bottom:-10px;">alarm</i>This reservation is currently Active and Pending!</h3>
     }else

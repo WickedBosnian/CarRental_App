@@ -10,11 +10,12 @@ namespace CarRental_UI.Controllers
     public class VehicleManufacturerController : Controller
     {
         private readonly IVehicleManufacturerRepository _vehicleManufacturerRepository;
-        private List<VehicleManufacturerDTO> GlobalVehicleManufacturers = new List<VehicleManufacturerDTO>();
+        private readonly IVehicleRepository _vehicleRepository;
 
-        public VehicleManufacturerController(IVehicleManufacturerRepository vehicleManufacturerRepository)
+        public VehicleManufacturerController(IVehicleManufacturerRepository vehicleManufacturerRepository, IVehicleRepository vehicleRepository)
         {
             _vehicleManufacturerRepository = vehicleManufacturerRepository;
+            _vehicleRepository = vehicleRepository;
         }
 
         // GET: VehicleManufacturerController
@@ -22,8 +23,7 @@ namespace CarRental_UI.Controllers
         {
             try
             {
-                GlobalVehicleManufacturers = _vehicleManufacturerRepository.GetAllVehicleManufacturers().ToList();
-                return View(GlobalVehicleManufacturers);
+                return View(_vehicleManufacturerRepository.GetAllVehicleManufacturers());
             }
             catch (Exception ex)
             {
@@ -160,15 +160,28 @@ namespace CarRental_UI.Controllers
         }
 
         // POST: VehicleManufacturerController/Delete/5
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int? id, VehicleManufacturerDTO vehicleManufacturer)
+        public ActionResult DeleteConfirmed(int? id)
         {
             try
             {
                 if (id == null)
                 {
                     return NotFound();
+                }
+
+                if (VehicleManufacturerHasVehicle((int)id))
+                {
+                    var vehicleManufacturer = _vehicleManufacturerRepository.GetVehicleManufacturerById((int)id);
+
+                    if (vehicleManufacturer == null)
+                    {
+                        return NotFound();
+                    }
+
+                    ViewBag.IsValid = false;
+                    return View("Delete", vehicleManufacturer);
                 }
 
                 int deletedClientId = _vehicleManufacturerRepository.DeleteVehicleManufacturer((int)id);
@@ -179,6 +192,19 @@ namespace CarRental_UI.Controllers
             {
                 return BadRequest(ex.Message + "; " + ex.InnerException?.Message);
             }
+        }
+
+        /// <summary>
+        /// Checks if any vehicles exist with passed vehicleManufacturerId
+        /// </summary>
+        /// <param name="vehicleManufacturerId">ID of vehicle manufacturer for deletion</param>
+        /// <returns>true if vehicle exists, otherwise false</returns>
+        private bool VehicleManufacturerHasVehicle(int vehicleManufacturerId)
+        {
+            VehicleDTO validationVehicle = new VehicleDTO() { VehicleManufacturerId = vehicleManufacturerId };
+            IEnumerable<VehicleDTO> vehicles = _vehicleRepository.SearchVehicles(validationVehicle, 1, 1);
+
+            return vehicles.Count() >= 1;
         }
     }
 }

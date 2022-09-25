@@ -5,6 +5,7 @@ using CarRental_DTO;
 using CarRental_Infrastructure.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace CarRental_UI.Controllers
 {
@@ -71,7 +72,11 @@ namespace CarRental_UI.Controllers
 
                     if (rowsCount == 0)
                     {
-                        return View(new ReservationDTO());
+                        this.ViewBag.MaxPage = (rowsCount / RowsPerPage) - (rowsCount % RowsPerPage == 0 ? 1 : 0) + 1;
+                        this.ViewBag.PageNumber = pageNumber;
+                        this.ViewBag.RowsCount = rowsCount;
+
+                        return View(new List<ReservationDTO>());
                     }
                 }
 

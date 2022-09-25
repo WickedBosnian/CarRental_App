@@ -2,18 +2,23 @@
 using CarRental_Application.Repositories;
 using CarRental_Application.Common;
 using CarRental_DTO;
+using CarRental_Domain.Entities;
+using CarRental_Infrastructure.Repositories;
 
 namespace CarRental_UI.Controllers
 {
     public class ClientController : Controller
     {
         private readonly IClientRepository _clientRepository;
+        private readonly IReservationRepository _reservationRepository;
         private readonly int RowsPerPage = 5;
         private IEnumerable<ClientDTO> GlobalClients;
 
-        public ClientController(IClientRepository clientRepository)
+        public ClientController(IClientRepository clientRepository, IReservationRepository reservationRepository)
         {
             _clientRepository = clientRepository;
+            _reservationRepository = reservationRepository;
+
             GlobalClients = new List<ClientDTO>();
         }
 
@@ -54,7 +59,11 @@ namespace CarRental_UI.Controllers
 
                     if (rowsCount == 0)
                     {
-                        return View(new ClientDTO());
+                        this.ViewBag.MaxPage = (rowsCount / RowsPerPage) - (rowsCount % RowsPerPage == 0 ? 1 : 0) + 1;
+                        this.ViewBag.PageNumber = pageNumber;
+                        this.ViewBag.RowsCount = rowsCount;
+
+                        return View(new List<ClientDTO>());
                     }
                 }
 
@@ -169,6 +178,11 @@ namespace CarRental_UI.Controllers
         {
             try
             {
+                if(!String.IsNullOrEmpty(client.DriverLicenceNumber) && IsDriverLicenceNumberTaken(client.DriverLicenceNumber))
+                {
+                    ModelState.AddModelError("DriverLicenceNumber", "Client with this Driver Licence Number already exists, Driver Licence Number has to be unique!");
+                }
+
                 if (ModelState.IsValid)
                 {
                     int clientId = _clientRepository.CreateClient(client);
@@ -286,6 +300,19 @@ namespace CarRental_UI.Controllers
                     return NotFound();
                 }
 
+                if (ClientHasReservation((int)id))
+                {
+                    var client = _clientRepository.GetClientById((int)id);
+
+                    if (client == null)
+                    {
+                        return NotFound();
+                    }
+
+                    ViewBag.IsValid = false;
+                    return View("Delete", client);
+                }
+
                 int deletedClientId = _clientRepository.DeleteClient((int)id);
 
                 return RedirectToAction(nameof(Index));
@@ -328,6 +355,32 @@ namespace CarRental_UI.Controllers
             session.SetString("filter_Gender", String.IsNullOrEmpty(filterClient.Gender) ? "" : filterClient.Gender);
             session.SetString("filter_Birthdate", filterClient.Birthdate != null ? filterClient.Birthdate.Value.ToShortDateString() : "");
             session.SetString("filter_DriverLicenceNumber", String.IsNullOrEmpty(filterClient.DriverLicenceNumber) ? "" : filterClient.DriverLicenceNumber);
+        }
+
+        /// <summary>
+        /// Checks if a client with passed driverLicenceNumber already exists
+        /// </summary>
+        /// <param name="driverLicenceNumber">Driver ID of a client</param>
+        /// <returns>true if a SearchClients returns a client, otherwise returns false</returns>
+        private bool IsDriverLicenceNumberTaken(string driverLicenceNumber)
+        {
+            ClientDTO validationClient = new ClientDTO() { DriverLicenceNumber = driverLicenceNumber };
+            IEnumerable<ClientDTO> clients = _clientRepository.SearchClients(validationClient, 1, 1);
+
+            return clients.Count() >= 1;
+        }
+
+        /// <summary>
+        /// Checks if any reservations exist with passed client id
+        /// </summary>
+        /// <param name="clientId">ID of client for deletion</param>
+        /// <returns>true if reservation exists, otherwise false</returns>
+        private bool ClientHasReservation(int clientId)
+        {
+            ReservationDTO validationReservation = new ReservationDTO() { ClientId = clientId };
+            IEnumerable<ReservationDTO> reservations = _reservationRepository.SearchReservations(validationReservation, 1, 1);
+
+            return reservations.Count() >= 1;
         }
     }
 }

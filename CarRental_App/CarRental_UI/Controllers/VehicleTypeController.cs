@@ -10,11 +10,13 @@ namespace CarRental_UI.Controllers
     public class VehicleTypeController : Controller
     {
         private readonly IVehicleTypeRepository _vehicleTypeRepository;
+        private readonly IVehicleRepository _vehicleRepository;
         private List<VehicleTypeDTO> GlobalVehicleTypes = new List<VehicleTypeDTO>();
 
-        public VehicleTypeController(IVehicleTypeRepository vehicleTypeRepository)
+        public VehicleTypeController(IVehicleTypeRepository vehicleTypeRepository, IVehicleRepository vehicleRepository)
         {
             _vehicleTypeRepository = vehicleTypeRepository;
+            _vehicleRepository = vehicleRepository;
         }
 
         // GET: VehicleTypeController
@@ -171,6 +173,19 @@ namespace CarRental_UI.Controllers
                     return NotFound();
                 }
 
+                if (VehicleTypeHasVehicle((int)id))
+                {
+                    var vehicleType = _vehicleTypeRepository.GetVehicleTypeById((int)id);
+
+                    if (vehicleType == null)
+                    {
+                        return NotFound();
+                    }
+
+                    ViewBag.IsValid = false;
+                    return View("Delete", vehicleType);
+                }
+
                 int deletedClientId = _vehicleTypeRepository.DeleteVehicleType((int)id);
 
                 return RedirectToAction(nameof(Index));
@@ -179,6 +194,19 @@ namespace CarRental_UI.Controllers
             {
                 return BadRequest(ex.Message + "; " + ex.InnerException?.Message);
             }
+        }
+
+        /// <summary>
+        /// Checks if any vehicles exist with passed vehicleTypeId
+        /// </summary>
+        /// <param name="vehicleTypeId">ID of vehicle type for deletion</param>
+        /// <returns>true if vehicle exists, otherwise false</returns>
+        private bool VehicleTypeHasVehicle(int vehicleTypeId)
+        {
+            VehicleDTO validationVehicle = new VehicleDTO() { VehicleTypeId = vehicleTypeId };
+            IEnumerable<VehicleDTO> vehicles = _vehicleRepository.SearchVehicles(validationVehicle, 1, 1);
+
+            return vehicles.Count() >= 1;
         }
     }
 }

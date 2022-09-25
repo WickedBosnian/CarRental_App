@@ -11,16 +11,20 @@ namespace CarRental_UI.Controllers
     public class VehicleController : Controller
     {
         private readonly IVehicleRepository _vehicleRepository;
-        private IVehicleTypeRepository _vehicleTypeRepository;
-        private IVehicleManufacturerRepository _vehicleManufacturerRepository;
+        private readonly IVehicleTypeRepository _vehicleTypeRepository;
+        private readonly IVehicleManufacturerRepository _vehicleManufacturerRepository;
+        private readonly IReservationRepository _reservationRepository;
+
         private readonly int RowsPerPage = 5;
         private IEnumerable<VehicleDTO> GlobalVehicles;
 
-        public VehicleController(IVehicleRepository vehicleRepository, IVehicleTypeRepository vehicleTypeRepository, IVehicleManufacturerRepository vehicleManufacturerRepository)
+        public VehicleController(IVehicleRepository vehicleRepository, IVehicleTypeRepository vehicleTypeRepository, IVehicleManufacturerRepository vehicleManufacturerRepository, IReservationRepository reservationRepository)
         {
             _vehicleRepository = vehicleRepository;
             _vehicleTypeRepository = vehicleTypeRepository;
             _vehicleManufacturerRepository = vehicleManufacturerRepository;
+            _reservationRepository = reservationRepository;
+
             GlobalVehicles = new List<VehicleDTO>();
         }
 
@@ -61,7 +65,12 @@ namespace CarRental_UI.Controllers
 
                     if (rowsCount == 0)
                     {
-                        return View(new VehicleDTO());
+                        //Calculates maximum number of pages
+                        this.ViewBag.MaxPage = (rowsCount / RowsPerPage) - (rowsCount % RowsPerPage == 0 ? 1 : 0) + 1;
+                        this.ViewBag.PageNumber = pageNumber;
+                        this.ViewBag.RowsCount = rowsCount;
+
+                        return View(new List<VehicleDTO>());
                     }
                 }
 
@@ -351,6 +360,19 @@ namespace CarRental_UI.Controllers
                     return NotFound();
                 }
 
+                if (VehicletHasReservation((int)id))
+                {
+                    var vehicle = _vehicleRepository.GetVehicleById((int)id);
+
+                    if (vehicle == null)
+                    {
+                        return NotFound();
+                    }
+
+                    ViewBag.IsValid = false;
+                    return View("Delete", vehicle);
+                }
+
                 int deletedVehicleId = _vehicleRepository.DeleteVehicle((int)id);
 
                 return RedirectToAction(nameof(Index));
@@ -385,6 +407,19 @@ namespace CarRental_UI.Controllers
             session.SetString("filter_VehicleManufacturerId", Convert.ToString(filterVehicle.VehicleManufacturerId));
             session.SetString("filter_filterVehicleTypeId", Convert.ToString(filterVehicle.VehicleTypeId));
 #pragma warning restore CS8604 // Possible null reference argument.
+        }
+
+        /// <summary>
+        /// Checks if any reservations exist with passed vehicleId
+        /// </summary>
+        /// <param name="vehicleId">ID of vehicle for deletion</param>
+        /// <returns>true if reservation exists, otherwise false</returns>
+        private bool VehicletHasReservation(int vehicleId)
+        {
+            ReservationDTO validationReservation = new ReservationDTO() { VehicleId = vehicleId };
+            IEnumerable<ReservationDTO> reservations = _reservationRepository.SearchReservations(validationReservation, 1, 1);
+
+            return reservations.Count() >= 1;
         }
     }
 }

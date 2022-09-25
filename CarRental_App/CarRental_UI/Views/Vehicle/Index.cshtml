@@ -102,7 +102,7 @@
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.VehicleId" class="btn btn-outline-warning">Edit</a>
                     <a asp-action="Details" asp-route-id="@item.VehicleId" class="btn btn-outline-info">Details</a>
-                    <a asp-action="CreateForClientOrVehicle" asp-controller="Reservation" style="margin:0px 0px 5px 0px;" class="btn btn-outline-success" asp-route-vehicleId="@item.VehicleId">Create a Reservation</a>
+                    <a asp-action="CreateForClientOrVehicle" asp-controller="Reservation" class="btn btn-outline-success" asp-route-vehicleId="@item.VehicleId">Create a Reservation</a>
                 </td>
             </tr>
         }

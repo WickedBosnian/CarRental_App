@@ -7,7 +7,14 @@
 
 <h1>Delete Vehicle</h1>
 
-<h3>Are you sure you want to delete this vehicle?</h3>
+@if (ViewBag.IsValid != null && ViewBag.IsValid == false)
+{
+    <h3 style="color:red; font-weight:bold;">This vehicle can't be deleted because it has reservations!</h3>
+}
+else
+{
+    <h3>Are you sure you want to delete this vehicle?</h3>
+}
 <div>
     <hr />
     <dl class="row">

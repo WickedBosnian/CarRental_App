@@ -33,6 +33,9 @@ CarRental app also allows for creating and manging clients, vehicles, vehicle ty
 CarRental consists of an application built in Visual Studio 2022 and a SQL database built with Microsoft SQL Server Management Studio 18 on a SQL server version 15.0.2000.5.
 
 CarRental app was written in .NET 6.0 using C#. 
+Frontend was created using MVC project.
+Views were written using HTML and CSS.
+Bootstrap was used as well.
 
 
 <!-- GETTING STARTED -->

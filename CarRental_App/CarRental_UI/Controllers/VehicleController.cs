@@ -13,7 +13,7 @@ namespace CarRental_UI.Controllers
         private readonly IVehicleRepository _vehicleRepository;
         private IVehicleTypeRepository _vehicleTypeRepository;
         private IVehicleManufacturerRepository _vehicleManufacturerRepository;
-        private readonly int RowsPerPage = 2;
+        private readonly int RowsPerPage = 5;
         private IEnumerable<VehicleDTO> GlobalVehicles;
 
         public VehicleController(IVehicleRepository vehicleRepository, IVehicleTypeRepository vehicleTypeRepository, IVehicleManufacturerRepository vehicleManufacturerRepository)
@@ -234,6 +234,11 @@ namespace CarRental_UI.Controllers
                 if (vehicle == null)
                 {
                     return NotFound();
+                }
+
+                if (vehicle.PricePerDay != null)
+                {
+                    vehicle.PricePerDay = Math.Round((decimal)vehicle.PricePerDay, 2);
                 }
 
                 if (vehicle.VehicleTypeId != null)

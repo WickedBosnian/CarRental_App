@@ -8,7 +8,7 @@ namespace CarRental_UI.Controllers
     public class ClientController : Controller
     {
         private readonly IClientRepository _clientRepository;
-        private readonly int RowsPerPage = 2;
+        private readonly int RowsPerPage = 5;
         private IEnumerable<ClientDTO> GlobalClients;
 
         public ClientController(IClientRepository clientRepository)

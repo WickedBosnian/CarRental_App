@@ -15,7 +15,7 @@ namespace CarRental_UI.Controllers
         private readonly IVehicleRepository _vehicleRepository;
         private readonly IVehicleTypeRepository _vehicleTypeRepository;
 
-        private readonly int RowsPerPage = 2;
+        private readonly int RowsPerPage = 5;
         private IEnumerable<ReservationDTO> GlobalReservation;
 
         public ReservationController(IReservationRepository reservationRepository, IClientRepository clientRepository, IVehicleRepository vehicleRepository, IVehicleTypeRepository vehicleTypeRepository)
@@ -188,7 +188,7 @@ namespace CarRental_UI.Controllers
         }
 
         /// <summary>
-        /// Returns Create view and gets all vehicles and clients
+        /// Gets all vehicles and their types and clients then returns Create view
         /// </summary>
         /// <returns>Create view</returns>
         public ActionResult Create()
@@ -207,6 +207,34 @@ namespace CarRental_UI.Controllers
                 ViewData["Clients"] = _clientRepository.GetAllClients();
 
                 return View();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message + " ; " + ex.InnerException?.Message);
+            }
+        }
+
+        /// <summary>
+        /// Gets all vehicles and their types and clients then returns Create view
+        /// </summary>
+        /// <param name="clientId">Optional parameter that holds ID of selected client for reservation</param>
+        /// <param name="vehicleId">Optional parameter that holds ID of selected vehicle for reservation</param>
+        /// <returns>Create view</returns>
+        [ActionName("CreateForClientOrVehicle")]
+        public ActionResult Create(int? clientId, int? vehicleId)
+        {
+            try
+            {
+                List<VehicleDTO> vehicles = SetVehiclesForReservation(vehicleId);
+                List<ClientDTO> clients = SetClientsForReservation(clientId);
+
+                ViewData["Vehicles"] = vehicles;
+                ViewData["Clients"] = clients;
+
+                ViewData["SelectedClientId"] = clientId;
+                ViewData["SelectedVehicleId"] = vehicleId;
+
+                return View("Create");
             }
             catch (Exception ex)
             {
@@ -373,6 +401,58 @@ namespace CarRental_UI.Controllers
             session.SetString("filter_VehicleID", Convert.ToString(filterReservation.VehicleId));
             session.SetString("filter_Active", Convert.ToString(filterReservation.Active));
 #pragma warning restore CS8604 // Possible null reference argument.
+        }
+
+        /// <summary>
+        /// Sets vehicle list for creating a reservation, if a vehicleId has been passed then it only gets that vehicle and vehicle type for that vehicle, otherwise it gets all vehicles and their types
+        /// </summary>
+        /// <param name="vehicleId">Optional parameter ID of vehicle for reservation</param>
+        /// <returns>List of Vehicles</returns>
+        private List<VehicleDTO> SetVehiclesForReservation(int? vehicleId)
+        {
+            List<VehicleDTO> vehicles = new List<VehicleDTO>();
+            if (vehicleId == null)
+            {
+                List<VehicleTypeDTO> vehicleTypes = _vehicleTypeRepository.GetAllVehicleTypes().ToList();
+                vehicles = _vehicleRepository.GetAllVehicles().ToList();
+
+                foreach (var vehicle in vehicles)
+                {
+                    vehicle.VehicleType = vehicleTypes.Where(x => x.VehicleTypeId == vehicle.VehicleTypeId).FirstOrDefault();
+                }
+            }
+            else
+            {
+                VehicleDTO vehicle = _vehicleRepository.GetVehicleById((int)vehicleId);
+                if (vehicle.VehicleTypeId != null)
+                {
+                    VehicleTypeDTO vehicleType = _vehicleTypeRepository.GetVehicleTypeById((int)vehicle.VehicleTypeId);
+                    vehicle.VehicleType = vehicleType;
+                }
+                vehicles.Add(vehicle);
+            }
+
+            return vehicles;
+        }
+
+        /// <summary>
+        /// Sets client list for creating a reservation, if a clientId has been passed then it only gets that client, otherwise it gets all clients
+        /// </summary>
+        /// <param name="clientId">Optional parameter ID of client for reservation</param>
+        /// <returns>List of Clients</returns>
+        private List<ClientDTO> SetClientsForReservation(int? clientId)
+        {
+            List<ClientDTO> clients = new List<ClientDTO>();
+            if(clientId == null)
+            {
+                clients = _clientRepository.GetAllClients().ToList();
+            }
+            else
+            {
+                clients.Add(_clientRepository.GetClientById((int)clientId));
+            }
+
+            return clients;
         }
     }
 }

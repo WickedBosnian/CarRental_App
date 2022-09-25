@@ -5,6 +5,8 @@
     ViewData["Title"] = "Create";
     IEnumerable<VehicleDTO>? vehicles = (IEnumerable<VehicleDTO>?)ViewData["Vehicles"];
     IEnumerable<ClientDTO>? clients = (IEnumerable<ClientDTO>?)ViewData["Clients"];
+    int? clientId = (int?)ViewData["SelectedClientId"];
+    int? vehicleId = (int?)ViewData["SelectedVehicleId"];
 }
 
 <h1>Reserve a Vehicle</h1>
@@ -31,7 +33,13 @@
                     <option selected value="">Vehicles...</option>
                     @foreach (VehicleDTO vehicle in vehicles ?? new List<VehicleDTO>())
                     {
-                        <option value="@vehicle.VehicleId">@vehicle.VehicleName - @vehicle.VehicleType?.VehicleTypeName</option>
+                        if (@vehicle.VehicleId == vehicleId)
+                        {
+                            <option selected value="@vehicle.VehicleId">@vehicle.VehicleName - @vehicle.VehicleType?.VehicleTypeName</option>
+                        }else
+                        {
+                            <option value="@vehicle.VehicleId">@vehicle.VehicleName - @vehicle.VehicleType?.VehicleTypeName</option>
+                        }
                     }
                 </select>
                 <span asp-validation-for="VehicleId" class="text-danger"></span>
@@ -42,7 +50,13 @@
                     <option selected value="">Clients...</option>
                     @foreach (ClientDTO client in clients ?? new List<ClientDTO>())
                     {
-                        <option value="@client.ClientId">@client.Firstname @client.Lastname - @client.DriverLicenceNumber</option>
+                        if (@client.ClientId == clientId)
+                        {
+                            <option selected value="@client.ClientId">@client.Firstname @client.Lastname - @client.DriverLicenceNumber</option>
+                        }else
+                        {
+                            <option value="@client.ClientId">@client.Firstname @client.Lastname - @client.DriverLicenceNumber</option>
+                        }
                     }
                 </select>
                 <span asp-validation-for="ClientId" class="text-danger"></span>

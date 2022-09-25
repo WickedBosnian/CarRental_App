@@ -24,6 +24,7 @@ namespace CarRental_DTO
         [DisplayName("Date Manufactured"), Required, DataType(DataType.Date)]
         public DateTime? DateManufactured { get; set; }
         [RegularExpression(@"^\d+(\.\d{1,2})?$", ErrorMessage = "Price has to be in correct format : xxx.xx")]
+        [Range(0, 9999999999999999.99)]
         [DisplayName("Price Per Day"), Required]
         public decimal? PricePerDay { get; set; }
         public virtual VehicleManufacturerDTO? VehicleManufacturer { get; set; }

@@ -52,9 +52,9 @@
         </dd>
     </dl>
 </div>
-<div>
-    <a asp-action="Edit" style="margin:5px 0px 5px 0px;" class="btn btn-outline-warning" asp-route-id="@Model?.ClientId">Edit</a>
-</div>
+    <a asp-action="Edit" style="margin:0px 0px 5px 0px;" class="btn btn-outline-warning" asp-route-id="@Model?.ClientId">Edit</a>
+    <a asp-action="CreateForClientOrVehicle" asp-controller="Reservation" style="margin:0px 0px 5px 0px;" class="btn btn-outline-success" asp-route-clientId="@Model?.ClientId">Create a Reservation</a>
+    <a asp-action="Delete" style="margin:0px 0px 5px 0px;" asp-route-id="@Model?.ClientId" class="btn btn-outline-danger">Delete</a>
 
 <div>
     <a class="btn btn-outline-dark" asp-action="Index">Back to List</a>

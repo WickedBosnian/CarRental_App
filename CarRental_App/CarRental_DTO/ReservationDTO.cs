@@ -16,13 +16,13 @@ namespace CarRental_DTO
         [Required, DisplayName("Client")]
         public int? ClientId { get; set; }
         [Required, DisplayName("Vehicle")]
-        public int? VehicleID { get; set; }
-        [Required, DisplayName("Reservation From")]
+        public int? VehicleId { get; set; }
+        [Required, DisplayName("Reservation From"), DataType(DataType.Date)]
         public DateTime? ReservationDateFrom { get; set; }
-        [Required, DisplayName("Reservation To")]
+        [Required, DisplayName("Reservation To"), DataType(DataType.Date)]
         public DateTime? ReservationDateTo { get; set; }
         public bool? Active { get; set; }
-        [Required, DisplayName("Client - Driver ID")]
+        [DisplayName("Client - Driver ID")]
         public virtual ClientDTO? Client { get; set; }
         public virtual VehicleDTO? Vehicle { get; set; }
     }

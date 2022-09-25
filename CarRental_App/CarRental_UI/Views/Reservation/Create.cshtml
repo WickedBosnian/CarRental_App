@@ -1,0 +1,74 @@
+﻿@using CarRental_DTO;
+@model ReservationDTO
+
+@{
+    ViewData["Title"] = "Create";
+    IEnumerable<VehicleDTO>? vehicles = (IEnumerable<VehicleDTO>?)ViewData["Vehicles"];
+    IEnumerable<ClientDTO>? clients = (IEnumerable<ClientDTO>?)ViewData["Clients"];
+}
+
+<h1>Reserve a Vehicle</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ReservationId" />
+            <div class="form-group">
+                <label asp-for="ReservationDateFrom" class="control-label"></label>
+                <input id="dateFrom" type="date" asp-for="ReservationDateFrom" class="form-control" />
+                <span asp-validation-for="ReservationDateFrom" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReservationDateTo" class="control-label"></label>
+                <input id="dateTo" type="date" asp-for="ReservationDateTo" class="form-control" />
+                <span asp-validation-for="ReservationDateTo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="VehicleId" class="control-label"></label>
+                <select asp-for="VehicleId" class="form-control">
+                    <option selected value="">Vehicles...</option>
+                    @foreach (VehicleDTO vehicle in vehicles ?? new List<VehicleDTO>())
+                    {
+                        <option value="@vehicle.VehicleId">@vehicle.VehicleName - @vehicle.VehicleType?.VehicleTypeName</option>
+                    }
+                </select>
+                <span asp-validation-for="VehicleId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClientId" class="control-label"></label>
+                <select asp-for="ClientId" class="form-control">
+                    <option selected value="">Clients...</option>
+                    @foreach (ClientDTO client in clients ?? new List<ClientDTO>())
+                    {
+                        <option value="@client.ClientId">@client.Firstname @client.Lastname - @client.DriverLicenceNumber</option>
+                    }
+                </select>
+                <span asp-validation-for="ClientId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" style="margin:5px 0px 5px 0px;" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a class="btn btn-outline-dark" asp-action="Index">Back to List</a>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<script type="text/javascript">
+
+    window.onload = function () {
+        SetDatePicker();
+    };
+
+</script>

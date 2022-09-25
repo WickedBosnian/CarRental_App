@@ -1,0 +1,61 @@
+﻿@using CarRental_DTO;
+@model ReservationDTO
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Reservation Details</h1>
+
+    @if (Model.Active == null || Model.Active == false)
+    {
+        <h3><i class="material-icons" style="font-size:48px;color:red; padding-bottom:-10px;">error_outline</i>This reservation is no longer Active!</h3>
+    }
+    else if (Model.Active != null && Model.Active == true && DateTime.Now.Date >= Model.ReservationDateTo)
+    {
+    <h3><i class="material-icons" style="font-size:48px;color:darkgoldenrod; padding-bottom:-10px;">add_alert</i>This reservation is still active but the date has Expired!</h3>
+    }
+    else if (Model.Active != null && Model.Active == true && Model.ReservationDateFrom >= DateTime.Now.Date)
+    {
+        <h3><i class="material-icons" style="font-size:48px;color:green; padding-bottom:-10px;">alarm</i>This reservation is currently Active and Pending!</h3>
+    }else
+    {
+        <h3><i class="material-icons" style="font-size:48px;color:green; padding-bottom:-10px;">check_circle</i>This reservation is currently Active!</h3>
+    }
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ReservationDateFrom)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ReservationDateFrom)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ReservationDateTo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ReservationDateTo)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Vehicle)
+        </dt>
+        <dd class="col-sm-10">
+            <span>@Model.Vehicle?.VehicleName</span>
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Client)
+        </dt>
+        <dd class="col-sm-10">
+            <span>@Model.Client?.Firstname @Model.Client?.Lastname - @Model.Client?.DriverLicenceNumber</span>
+        </dd>
+    </dl>
+
+    @if (Model.Active != null && Model.Active == true)
+    {
+        <a asp-action="Cancel" asp-route-id="@Model.ReservationId" class="btn btn-outline-danger" style="margin-bottom:5px;">Cancel</a>
+    }
+</div>
+
+<div>
+    <a class="btn btn-outline-dark" asp-action="Index">Back to List</a>
+</div>

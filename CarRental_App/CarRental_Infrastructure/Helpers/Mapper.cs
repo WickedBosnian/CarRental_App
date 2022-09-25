@@ -69,7 +69,7 @@ namespace CarRental_Infrastructure.Helpers
                 ReservationDateTo = reservation.ReservationDateTo,
                 Active = reservation.Active,
                 ClientId = reservation.ClientId,
-                VehicleID = reservation.VehicleID,
+                VehicleId = reservation.VehicleID,
                 Client = reservation.Client != null ? ToClientDTO(reservation.Client) : null,
                 Vehicle = reservation.Vehicle != null ? ToVehicleDTO(reservation.Vehicle) : null
             };

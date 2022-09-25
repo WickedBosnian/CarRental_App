@@ -13,15 +13,18 @@ namespace CarRental_UI.Controllers
         private readonly IReservationRepository _reservationRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IVehicleRepository _vehicleRepository;
+        private readonly IVehicleTypeRepository _vehicleTypeRepository;
 
         private readonly int RowsPerPage = 2;
         private IEnumerable<ReservationDTO> GlobalReservation;
 
-        public ReservationController(IReservationRepository reservationRepository, IClientRepository clientRepository, IVehicleRepository vehicleRepository)
+        public ReservationController(IReservationRepository reservationRepository, IClientRepository clientRepository, IVehicleRepository vehicleRepository, IVehicleTypeRepository vehicleTypeRepository)
         {
             _reservationRepository = reservationRepository;
             _clientRepository = clientRepository;
             _vehicleRepository = vehicleRepository;
+            _vehicleTypeRepository = vehicleTypeRepository;
+
             GlobalReservation = new List<ReservationDTO>();
         }
 
@@ -130,9 +133,9 @@ namespace CarRental_UI.Controllers
                     reservation.Client = _clientRepository.GetClientById((int)reservation.ClientId);
                 }
 
-                if (reservation.VehicleID != null)
+                if (reservation.VehicleId != null)
                 {
-                    reservation.Vehicle = _vehicleRepository.GetVehicleById((int)reservation.VehicleID);
+                    reservation.Vehicle = _vehicleRepository.GetVehicleById((int)reservation.VehicleId);
                 }
 
                 return View(reservation);
@@ -192,7 +195,15 @@ namespace CarRental_UI.Controllers
         {
             try
             {
-                ViewData["Vehicles"] = _vehicleRepository.GetAllVehicles();
+                List<VehicleTypeDTO> vehicleTypes = _vehicleTypeRepository.GetAllVehicleTypes().ToList();
+                List<VehicleDTO> vehicles = _vehicleRepository.GetAllVehicles().ToList();
+
+                foreach(var vehicle in vehicles)
+                {
+                    vehicle.VehicleType = vehicleTypes.Where(x=>x.VehicleTypeId == vehicle.VehicleTypeId).FirstOrDefault();
+                }
+
+                ViewData["Vehicles"] = vehicles;
                 ViewData["Clients"] = _clientRepository.GetAllClients();
 
                 return View();
@@ -214,51 +225,42 @@ namespace CarRental_UI.Controllers
         {
             try
             {
+                if(reservation.ReservationDateFrom > reservation.ReservationDateTo || reservation.ReservationDateTo < DateTime.Now.Date || reservation.ReservationDateFrom < DateTime.Now.Date)
+                {
+                    ModelState.AddModelError("ReservationDateFrom", $"Reservation Date From must to be before Reservation Date To and can not be before today ({DateTime.Now.Date})!");
+                    ModelState.AddModelError("ReservationDateTo", $"Reservation Date To must to be after Reservation Date From and can not be before today ({DateTime.Now.Date})!");   
+                }
+
+                if (_reservationRepository.IsVehicleReservedForPeriod(reservation))
+                {
+                    ModelState.AddModelError("VehicleId", "This vehicle is already reserved for given time period!");
+                }
+
+                if (reservation.ClientId != null && _reservationRepository.CountOfActiveReservationsForClient((int)reservation.ClientId) >= 3)
+                {
+                    ModelState.AddModelError("ClientId", "This client already has 3 active reservations! Maximum number of active reservations at one time is 3!");
+                }
+
+                if(_reservationRepository.CountOfActiveReservationsForClientWithVehicleType(reservation) >= 1)
+                {
+                    ModelState.AddModelError("VehicleId", "This client already has 1 active reservation for this type of vehicle! Maximum number of active reservations with a same vehicle type at one time is 1!");
+                }
+
                 if (ModelState.IsValid)
                 {
                     int reservationId = _reservationRepository.CreateReservation(reservation);
                     return RedirectToAction("Details", new { id = reservationId });
                 }
-                return View(reservation);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message + "; " + ex.InnerException?.Message);
-            }
-        }
 
-        /// <summary>
-        /// Calls GetReservationById service which returns a record frome Reservation table based on ID and then returns a view for editing reservations
-        /// </summary>
-        /// <param name="id">ID of the vehicle record</param>
-        /// <returns>Edit View</returns>
-        public ActionResult Edit(int? id)
-        {
-            try
-            {
-                if (id == null)
+                List<VehicleTypeDTO> vehicleTypes = _vehicleTypeRepository.GetAllVehicleTypes().ToList();
+                List<VehicleDTO> vehicles = _vehicleRepository.GetAllVehicles().ToList();
+
+                foreach (var vehicle in vehicles)
                 {
-                    return NotFound();
+                    vehicle.VehicleType = vehicleTypes.Where(x => x.VehicleTypeId == vehicle.VehicleTypeId).FirstOrDefault();
                 }
 
-                var reservation = _reservationRepository.GetReservationById((int)id);
-
-                if (reservation == null)
-                {
-                    return NotFound();
-                }
-
-                if (reservation.ClientId != null)
-                {
-                    reservation.Client = _clientRepository.GetClientById((int)reservation.ClientId);
-                }
-
-                if (reservation.VehicleID != null)
-                {
-                    reservation.Vehicle = _vehicleRepository.GetVehicleById((int)reservation.VehicleID);
-                }
-
-                ViewData["Vehicles"] = _vehicleRepository.GetAllVehicles();
+                ViewData["Vehicles"] = vehicles;
                 ViewData["Clients"] = _clientRepository.GetAllClients();
 
                 return View(reservation);
@@ -290,9 +292,9 @@ namespace CarRental_UI.Controllers
                     return NotFound();
                 }
 
-                if (reservation.VehicleID != null)
+                if (reservation.VehicleId != null)
                 {
-                    reservation.Vehicle = _vehicleRepository.GetVehicleById((int)reservation.VehicleID);
+                    reservation.Vehicle = _vehicleRepository.GetVehicleById((int)reservation.VehicleId);
                 }
 
                 if (reservation.ClientId != null)
@@ -325,14 +327,9 @@ namespace CarRental_UI.Controllers
                     return NotFound();
                 }
 
-                if (ModelState.IsValid)
-                {
                     _reservationRepository.CancelReservation((int)id);
 
-                    return RedirectToAction("Details", new { id = id });
-                }
-
-                return View(reservation);
+                return RedirectToAction("Details", new { id = id });
             }
             catch (Exception ex)
             {
@@ -355,7 +352,7 @@ namespace CarRental_UI.Controllers
 #pragma warning restore CS8604 // Possible null reference argument.
 
             filterReservation.ClientId = String.IsNullOrEmpty(session.GetString("filter_ClientId")) ? null : Convert.ToInt32(session.GetString("filter_ClientId"));
-            filterReservation.VehicleID = String.IsNullOrEmpty(session.GetString("filter_VehicleID")) ? null : Convert.ToInt32(session.GetString("filter_VehicleID"));
+            filterReservation.VehicleId = String.IsNullOrEmpty(session.GetString("filter_VehicleID")) ? null : Convert.ToInt32(session.GetString("filter_VehicleID"));
             filterReservation.Active = String.IsNullOrEmpty(session.GetString("filter_Active")) ? null : Convert.ToBoolean(session.GetString("filter_Active"));
 
             return filterReservation;
@@ -373,7 +370,7 @@ namespace CarRental_UI.Controllers
             session.SetString("filter_ReservationDateFrom", Convert.ToString(filterReservation.ReservationDateFrom));
             session.SetString("filter_ReservationDateTo", Convert.ToString(filterReservation.ReservationDateTo));
             session.SetString("filter_ClientId", Convert.ToString(filterReservation.ClientId));
-            session.SetString("filter_VehicleID", Convert.ToString(filterReservation.VehicleID));
+            session.SetString("filter_VehicleID", Convert.ToString(filterReservation.VehicleId));
             session.SetString("filter_Active", Convert.ToString(filterReservation.Active));
 #pragma warning restore CS8604 // Possible null reference argument.
         }

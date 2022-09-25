@@ -22,7 +22,7 @@
             <option selected value="">Vehicles...</option>
             @foreach (VehicleDTO vehicle in vehicles ?? new List<VehicleDTO>())
             {
-                if (FilterReservation?.VehicleID == vehicle.VehicleId)
+                if (FilterReservation?.VehicleId == vehicle.VehicleId)
                 {
                     <option selected value="@vehicle.VehicleId">@vehicle.VehicleName</option>
                 }
@@ -45,6 +45,26 @@
                 {
                     <option value="@client.ClientId">@client.Firstname @client.Lastname (@client.DriverLicenceNumber)</option>
                 }
+            }
+        </select>
+
+        <select id="active" name="Active" class="form-select form-control rounded" style="margin:5px;">
+            <option selected value="">Status...</option>
+            @if (FilterReservation?.Active == true)
+            {
+                <option selected value="true">Active</option>
+            }
+            else
+            {
+                <option value="true">Active</option>
+            }
+            @if (FilterReservation?.Active == false)
+            {
+                <option selected value="false">Inactive</option>
+            }
+            else
+            {
+                <option value="false">Inactive</option>
             }
         </select>
 
@@ -72,7 +92,19 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
+            var rowStyle = "";
+            var editButtonClass = "btn btn-outline-info";
+            var whiteBackgroundButtonStyle = "";
+            if(item.Active == null || item.Active == false){
+                rowStyle = "background-color: rgba(255, 0, 0, 0.2);";
+                whiteBackgroundButtonStyle = "background-color: white;";
+            }
+            else if (item.Active != null && item.Active == true && DateTime.Now.Date >= item.ReservationDateTo)
+            {
+                rowStyle = "background-color: rgba(184, 134, 11, 0.2);";
+                whiteBackgroundButtonStyle = "background-color: white;";
+            }
+            <tr style="@rowStyle">
                 <td>
                     @Html.DisplayFor(modelItem => item.ReservationDateFrom)
                 </td>
@@ -92,9 +124,11 @@
                     }
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.ReservationId" class="btn btn-outline-warning">Edit</a>
-                    <a asp-action="Details" asp-route-id="@item.ReservationId" class="btn btn-outline-info">Details</a>
-                    <a asp-action="Cancel" asp-route-id="@item.ReservationId" class="btn btn-outline-danger">Cancel</a>
+                    <a asp-action="Details" asp-route-id="@item.ReservationId" class="@editButtonClass" style="@whiteBackgroundButtonStyle">Details</a>
+                    @if(item.Active != null && item.Active == true)
+                    {
+                        <a asp-action="Cancel" asp-route-id="@item.ReservationId" style="@whiteBackgroundButtonStyle" class="btn btn-outline-danger">Cancel</a>
+                    }
                 </td>
             </tr>
         }

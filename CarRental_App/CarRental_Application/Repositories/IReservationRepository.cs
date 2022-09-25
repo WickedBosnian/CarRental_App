@@ -18,5 +18,8 @@ namespace CarRental_Application.Repositories
         void CancelReservation(int id);
         int CountOfReservations();
         int CountOfReservationsWithFilters(ReservationDTO filterReservation);
+        int CountOfActiveReservationsForClient(int clientId);
+        int CountOfActiveReservationsForClientWithVehicleType(ReservationDTO filterReservation);
+        bool IsVehicleReservedForPeriod(ReservationDTO reservation);
     }
 }

@@ -59,7 +59,7 @@ namespace CarRental_Infrastructure.Repositories
                 List<SqlParameter> sqlParams = new List<SqlParameter>
                 {
                     new SqlParameter { ParameterName = "@ClientId", Value = reservation.ClientId},
-                    new SqlParameter { ParameterName = "@VehicleID", Value = reservation.VehicleID},
+                    new SqlParameter { ParameterName = "@VehicleID", Value = reservation.VehicleId},
                     new SqlParameter { ParameterName = "@ReservationDateFrom", Value = reservation.ReservationDateFrom},
                     new SqlParameter { ParameterName = "@ReservationDateTo", Value = reservation.ReservationDateTo}
                 };
@@ -158,7 +158,7 @@ namespace CarRental_Infrastructure.Repositories
                     new SqlParameter { ParameterName = "@DateFrom", Value = reservation.ReservationDateFrom == null ? DBNull.Value : reservation.ReservationDateFrom},
                     new SqlParameter { ParameterName = "@DateTo", Value = reservation.ReservationDateTo == null ? DBNull.Value : reservation.ReservationDateTo},
                     new SqlParameter { ParameterName = "@ClientId", Value = reservation.ClientId == null ? DBNull.Value : reservation.ClientId},
-                    new SqlParameter { ParameterName = "@VehicleId", Value = reservation.VehicleID == null ? DBNull.Value : reservation.VehicleID},
+                    new SqlParameter { ParameterName = "@VehicleId", Value = reservation.VehicleId == null ? DBNull.Value : reservation.VehicleId},
                     new SqlParameter { ParameterName = "@Active", Value = reservation.Active == null ? DBNull.Value : reservation.Active},
                     new SqlParameter { ParameterName = "@PageNumber", Value = pageNumber},
                     new SqlParameter { ParameterName = "@RowsPerPage", Value = rowsPerPage}
@@ -207,8 +207,96 @@ namespace CarRental_Infrastructure.Repositories
                     new SqlParameter { ParameterName = "@DateFrom", Value = filterReservation.ReservationDateFrom == null ? DBNull.Value : filterReservation.ReservationDateFrom},
                     new SqlParameter { ParameterName = "@DateTo", Value = filterReservation.ReservationDateTo == null ? DBNull.Value : filterReservation.ReservationDateTo},
                     new SqlParameter { ParameterName = "@ClientId", Value = filterReservation.ClientId == null ? DBNull.Value : filterReservation.ClientId},
-                    new SqlParameter { ParameterName = "@VehicleId", Value = filterReservation.VehicleID == null ? DBNull.Value : filterReservation.VehicleID},
+                    new SqlParameter { ParameterName = "@VehicleId", Value = filterReservation.VehicleId == null ? DBNull.Value : filterReservation.VehicleId},
                     new SqlParameter { ParameterName = "@Active", Value = filterReservation.Active == null ? DBNull.Value : filterReservation.Active},
+                };
+
+                SqlCommand cmd = new SqlCommand(sqlCommand, new SqlConnection(_context.Database.GetConnectionString()));
+
+                cmd.Parameters.AddRange(sqlParams.ToArray());
+                cmd.Connection.Open();
+
+                countOfReservations = (int)cmd.ExecuteScalar();
+
+                cmd.Connection.Close();
+
+                return countOfReservations;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception(sqlEx.Message + ";" + sqlEx.InnerException?.Message);
+            }
+        }
+
+        public bool IsVehicleReservedForPeriod(ReservationDTO reservation)
+        {
+            bool isReserved = false;
+            string sqlCommand = "SELECT dbo.IsVehicleReservedForPeriod(@VehicleId, @From, @To)";
+
+            try
+            {
+                List<SqlParameter> sqlParams = new List<SqlParameter>
+                {
+                    new SqlParameter { ParameterName = "@VehicleId", Value = reservation.VehicleId == null ? DBNull.Value : reservation.VehicleId},
+                    new SqlParameter { ParameterName = "@From", Value = reservation.ReservationDateFrom == null ? DBNull.Value : reservation.ReservationDateFrom},
+                    new SqlParameter { ParameterName = "@To", Value = reservation.ReservationDateTo == null ? DBNull.Value : reservation.ReservationDateTo}
+                };
+
+                SqlCommand cmd = new SqlCommand(sqlCommand, new SqlConnection(_context.Database.GetConnectionString()));
+
+                cmd.Parameters.AddRange(sqlParams.ToArray());
+                cmd.Connection.Open();
+
+                isReserved = (bool)cmd.ExecuteScalar();
+
+                cmd.Connection.Close();
+
+                return isReserved;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception(sqlEx.Message + ";" + sqlEx.InnerException?.Message);
+            }
+        }
+
+        public int CountOfActiveReservationsForClient(int clientId)
+        {
+            string sqlCommand = "SELECT dbo.GetNumberOfActiveReservationsForClient(@Client)";
+            int countOfReservations = -1;
+            try
+            {
+                List<SqlParameter> sqlParams = new List<SqlParameter>
+                {
+                    new SqlParameter { ParameterName = "@Client", Value = clientId}
+                };
+
+                SqlCommand cmd = new SqlCommand(sqlCommand, new SqlConnection(_context.Database.GetConnectionString()));
+
+                cmd.Parameters.AddRange(sqlParams.ToArray());
+                cmd.Connection.Open();
+
+                countOfReservations = (int)cmd.ExecuteScalar();
+
+                cmd.Connection.Close();
+
+                return countOfReservations;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception(sqlEx.Message + ";" + sqlEx.InnerException?.Message);
+            }
+        }
+
+        public int CountOfActiveReservationsForClientWithVehicleType(ReservationDTO filterReservation)
+        {
+            string sqlCommand = "SELECT dbo.GetNumberOfReservationsWithSameVehicleTypeForClient(@ClientId, @VehicleId)";
+            int countOfReservations = -1;
+            try
+            {
+                List<SqlParameter> sqlParams = new List<SqlParameter>
+                {
+                    new SqlParameter { ParameterName = "@ClientId", Value = filterReservation.ClientId},
+                    new SqlParameter { ParameterName = "@VehicleId", Value = filterReservation.VehicleId}
                 };
 
                 SqlCommand cmd = new SqlCommand(sqlCommand, new SqlConnection(_context.Database.GetConnectionString()));

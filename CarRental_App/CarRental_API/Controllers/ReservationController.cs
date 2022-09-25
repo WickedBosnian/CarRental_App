@@ -44,7 +44,7 @@ namespace CarRental_API.Controllers
                     ReservationDateFrom = dateFrom,
                     ReservationDateTo = dateTo,
                     ClientId = clientId,
-                    VehicleID = vehicleId,
+                    VehicleId = vehicleId,
                     Active = active
                 };
 
@@ -64,7 +64,7 @@ namespace CarRental_API.Controllers
             {
                 ReservationDTO reservation = _reservationRepository.GetReservationById(id);
                 reservation.Client = _clientRepository.GetClientById((int)reservation.ClientId);
-                reservation.Vehicle = _vehicleRepository.GetVehicleById((int)reservation.VehicleID);
+                reservation.Vehicle = _vehicleRepository.GetVehicleById((int)reservation.VehicleId);
 
                 return Ok(reservation);
             }

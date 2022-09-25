@@ -18,7 +18,6 @@ Web app for renting cars and managing clients.
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#roadmap">Roadmap</a></li>
   </ol>
 </details>
 

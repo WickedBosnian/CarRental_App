@@ -81,7 +81,7 @@
                 @Html.DisplayNameFor(model => model.ReservationDateTo)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Vehicle.VehicleName)
+                @Html.DisplayNameFor(model => model.Vehicle)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Client)
@@ -92,6 +92,7 @@
     <tbody>
         @foreach (var item in Model)
         {
+            //Varialbles are used for displaying statuses of reservations, rgba(255, 0, 0, 0.2) = inactive; rgba(184, 134, 11, 0.2) = active but past it's due date
             var rowStyle = "";
             var editButtonClass = "btn btn-outline-info";
             var whiteBackgroundButtonStyle = "";

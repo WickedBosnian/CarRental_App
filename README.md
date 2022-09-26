@@ -65,8 +65,6 @@ It is recommended to use Microsoft SQL Server Management Studio 18.</br>
    ```sh
    git clone https://github.com/WickedBosnian/CarRental_App.git
    ```
-Repository is public so there is no need for any authentication.
-
 <!-- PROJECT STRUCTURE -->
 ### Project structure
 

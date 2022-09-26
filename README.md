@@ -41,7 +41,7 @@ User documentation is included in the git files and can be regarded as sort of a
 
 ### Built With
 
-CarRental consists of an application built in Visual Studio 2022 and a SQL database built with Microsoft SQL Server Management Studio 18 on a SQL server version 15.0.2000.5.</br>
+CarRental consists of an application built in Visual Studio 2022 and a SQL database built with Microsoft SQL Server Management Studio 18 on a SQL Server 2019 version 15.0.2000.5.</br>
 </br>
 CarRental app was written in .NET 6.0 using C#. 
 Frontend was created using MVC project.

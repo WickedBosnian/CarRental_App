@@ -37,6 +37,7 @@ Web app for renting cars and managing clients.
 CarRental app allows users to reserve vehicles for clients.
 CarRental app also allows for creating and manging clients, vehicles, vehicle types and vehicle manufacturers.
 
+User documentation is included in the git files and can be regarded as sort of a manual for using the web app.
 
 ### Built With
 
